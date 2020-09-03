@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 using Contracts;
 
@@ -6,17 +8,24 @@ namespace Services
 {
     public class ConsoleMenuService : IConsoleMenuService
     {
-        public void DrawMenu()
+        private readonly IChannelEngineServiceWrapper _channelEngineService;
+
+        public ConsoleMenuService(IChannelEngineServiceWrapper channelEngineService)
+        {
+            _channelEngineService = channelEngineService;
+        }
+
+        public async Task DrawMenuAsync()
         {
             bool showMenu = true;
 
             while (showMenu)
             {
-                showMenu = MainMenu();
+                showMenu = await MainMenu();
             }
         }
 
-        private bool MainMenu()
+        private async Task<bool> MainMenu()
         {
             Console.Clear();
             Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
@@ -31,7 +40,7 @@ namespace Services
             switch (key)
             {
                 case ConsoleKey.D1:
-                    ShowAllProductsWithStatus();
+                    await ShowAllProductsWithStatus();
                     return true;
                 case ConsoleKey.D2:
                     ShowTopFiveProducts();
@@ -49,20 +58,24 @@ namespace Services
             }
         }
 
-        private static void ShowAllProductsWithStatus()
+        private async Task ShowAllProductsWithStatus()
         {
             Console.Clear();
             Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
-            Console.WriteLine("1. | Dummy order");
-            Console.WriteLine("2. | Dummy order");
-            Console.WriteLine("3. | Dummy order");
-            Console.WriteLine("4. | Dummy order");
-            Console.WriteLine("5. | Dummy order");
-            Console.WriteLine("6. | Dummy order");
-            Console.WriteLine("7. | Dummy order");
-            Console.WriteLine("8. | Dummy order");
-            Console.WriteLine("9. | Dummy order");
-            Console.WriteLine("10.| Dummy order");
+
+            try
+            {
+                var orders = await _channelEngineService.Orders.GetAllWithStatusAsync("IN_PROGRESS");
+                foreach (var order in orders)
+                {
+                    Console.WriteLine($"{order.Id} {order.ChannelName} {order.GlobalChannelName}");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                HandleError(ex.Message);
+            }
+            
             Console.WriteLine();
             Console.WriteLine("Press any key to return to main menu...");
             Console.ReadKey();
@@ -138,6 +151,12 @@ namespace Services
             Console.WriteLine();
             Console.WriteLine("Press any key to return to main menu...");
             Console.ReadKey();
+        }
+
+        private void HandleError(string message)
+        {
+            Console.WriteLine("Something went wrong.");
+            Console.WriteLine($"Message:\n{message}");
         }
     }
 }

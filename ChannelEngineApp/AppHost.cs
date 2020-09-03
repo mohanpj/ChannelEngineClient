@@ -1,4 +1,5 @@
-﻿using Contracts;
+﻿using System.Threading.Tasks;
+using Contracts;
 
 namespace ChannelEngineConsoleApp
 {
@@ -11,9 +12,9 @@ namespace ChannelEngineConsoleApp
             _consoleMenuService = consoleMenuService;
         }
 
-        public void Run()
+        public async Task RunAsync()
         {
-            _consoleMenuService.DrawMenu();
+            await _consoleMenuService.DrawMenuAsync();
         }
     }
 }

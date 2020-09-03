@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Reflection;
-
+using System.Threading.Tasks;
 using Contracts;
 
 using Microsoft.Extensions.Configuration;
@@ -17,13 +17,13 @@ namespace ChannelEngineConsoleApp
         private static IServiceProvider _services;
         private static readonly HttpClient HttpClient = new HttpClient();
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             CreateConfiguration();
             ConfigureServices();
             ConfigureClient();
 
-            _services.GetService<AppHost>().Run();
+            await _services.GetService<AppHost>().RunAsync();
         }
 
         private static void CreateConfiguration()
@@ -37,8 +37,9 @@ namespace ChannelEngineConsoleApp
         private static void ConfigureServices()
         {
             _services = new ServiceCollection()
-                .AddSingleton<AppHost>()
+                .AddScoped<IChannelEngineServiceWrapper, ChannelEngineServiceWrapper>(provider => new ChannelEngineServiceWrapper(HttpClient))
                 .AddSingleton<IConsoleMenuService, ConsoleMenuService>()
+                .AddSingleton<AppHost>()
                 .BuildServiceProvider();
         }
 
@@ -46,6 +47,7 @@ namespace ChannelEngineConsoleApp
         {
             HttpClient.BaseAddress = new Uri($"{_config["AppConfig:ApiBaseUri"]}{_config["AppConfig:ApiVersion"]}");
             HttpClient.DefaultRequestHeaders.Add("User-Agent", _config["AppConfig:UserAgent"]);
+            HttpClient.DefaultRequestHeaders.Add("X-CE-KEY", _config["ChEng:ApiKey"]);
         }
     }
 }

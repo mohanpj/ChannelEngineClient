@@ -1,7 +1,9 @@
-﻿namespace Contracts
+﻿using System.Threading.Tasks;
+
+namespace Contracts
 {
     public interface IConsoleMenuService
     {
-        void DrawMenu();
+        Task DrawMenuAsync();
     }
 }
