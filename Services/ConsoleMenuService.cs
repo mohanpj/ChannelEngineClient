@@ -63,19 +63,21 @@ namespace Services
             Console.Clear();
             Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
 
-            try
+            var response = await _channelEngineService.Orders.GetAllWithStatusAsync("IN_PROGRESS");
+
+            if (response.Success)
             {
-                var orders = await _channelEngineService.Orders.GetAllWithStatusAsync("IN_PROGRESS");
-                foreach (var order in orders)
+                foreach (var order in response.Content)
                 {
                     Console.WriteLine($"{order.Id} {order.ChannelName} {order.GlobalChannelName}");
                 }
             }
-            catch (HttpRequestException ex)
+            else
             {
-                HandleError(ex.Message);
+                HandleError(response.Message);
             }
             
+
             Console.WriteLine();
             Console.WriteLine("Press any key to return to main menu...");
             Console.ReadKey();
