@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using ConsoleTables;
+
 using Contracts;
+
 using Models;
 
 namespace Services
@@ -28,8 +33,7 @@ namespace Services
             Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
             Console.WriteLine("Choose option:");
             Console.WriteLine("1) Get all orders with status");
-            Console.WriteLine("2) Get top 5 products sold");
-            Console.WriteLine("3) Set product quantity to 25");
+            Console.WriteLine("2) Set product quantity to 25");
             Console.WriteLine("0) EXIT");
             Console.WriteLine();
             var key = Console.ReadKey().Key;
@@ -40,9 +44,6 @@ namespace Services
                     await ShowAllOrdersWithStatus();
                     return true;
                 case ConsoleKey.D2:
-                    ShowTopFiveProducts();
-                    return true;
-                case ConsoleKey.D3:
                     SelectProductToUpdate();
                     return true;
                 case ConsoleKey.D0:
@@ -67,53 +68,96 @@ namespace Services
             if (response.Success)
             {
                 if (response.Content.Any())
+                {
+                    var table = new ConsoleTable("ID", "Channel name", "No of products");
                     foreach (var order in response.Content)
-                        Console.WriteLine(
-                            $"{order.Id,-5}|{order.ChannelName,-20}|{order.Lines.Sum(p => p.Quantity),-10}");
+                    {
+                        table.AddRow(order.Id, order.ChannelName, order.Lines.Sum(l => l.Quantity));
+                    }
+                    table.Write(Format.Minimal);
+                }
                 else
+                {
                     Console.WriteLine("No data to display.");
+                    Console.WriteLine();
+                    Console.WriteLine("Press any key to return...");
+                    Console.ReadKey();
+                    return;
+                }
+
+                while (true)
+                {
+                    Console.WriteLine("1) Get top 5 products sold");
+                    Console.WriteLine("0) BACK");
+                    Console.WriteLine();
+                    var key = Console.ReadKey().Key;
+                    
+                    switch (key)
+                    {
+                        case ConsoleKey.D1:
+                            ShowTopFiveProducts(response.Content);
+                            break;
+                        case ConsoleKey.D0:
+                            break;
+                        default:
+                            Console.WriteLine("\nInvalid option selected. Try again...");
+                            continue;
+                    }
+
+                    break;
+                }
             }
             else
             {
-                HandleError(response.Message);
+                HandleError(response);
             }
-
-            Console.WriteLine();
-            Console.WriteLine("Press any key to return to main menu...");
-            Console.ReadKey();
         }
 
         private OrderStatus SelectOrderStatus()
         {
             Console.Clear();
             Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
-
+            Console.WriteLine("Available statuses");
+            
             var orderStatusNames = Enum.GetNames(typeof(OrderStatus));
-            for (var i = 1; i <= orderStatusNames.Length; i++) Console.WriteLine($"{i - 1}) {orderStatusNames[i - 1]}");
+            
+            for (var i = 1; i <= orderStatusNames.Length; i++)
+            {
+                Console.WriteLine($"{i - 1}) {orderStatusNames[i - 1]}");
+            }
+            
             Console.WriteLine();
             Console.WriteLine("Select status:");
+            
             var key = Console.ReadLine();
-            OrderStatus result;
 
-            while (!Enum.TryParse(key, out result))
+            while (int.TryParse(key, out int keyValue) && !Enum.IsDefined(typeof(OrderStatus), keyValue))
             {
                 Console.WriteLine("Invalid status selected. Try again");
                 key = Console.ReadLine();
             }
-
-            return result;
+            
+            return Enum.Parse<OrderStatus>(key!);
         }
 
-        private void ShowTopFiveProducts()
+        private void ShowTopFiveProducts(IEnumerable<Order> orders)
         {
+            var products = orders.SelectMany(o => o.Lines)
+                .OrderByDescending(p => p.Quantity)
+                .Take(5)
+                .ToArray();
+
             Console.Clear();
             Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
-            Console.WriteLine("1. | Dummy product  | Quantity: 25");
-            Console.WriteLine("2. | Dummy product  | Quantity: 16");
-            Console.WriteLine("3. | Dummy product  | Quantity: 15");
-            Console.WriteLine("4. | Dummy product  | Quantity: 10");
-            Console.WriteLine("5. | Dummy product  | Quantity: 9");
-            Console.WriteLine();
+
+            var table = new ConsoleTable("ID", "Name", "Ean", "Quantity");
+            for (int i = 0; i < products.Length; i++)
+            {
+                table.AddRow(products[i].MerchantProductNo, products[i].Description, products[i].Gtin, products[i].Quantity);
+            }
+
+            table.Write(Format.Minimal);
+
             Console.WriteLine("Press any key to return to main menu...");
             Console.ReadKey();
         }
@@ -175,10 +219,11 @@ namespace Services
             Console.ReadKey();
         }
 
-        private void HandleError(string message)
+        private void HandleError(BaseResponseWrapper response)
         {
             Console.WriteLine("Something went wrong.");
-            Console.WriteLine($"Message:\n{message}");
+            Console.WriteLine($"Status Code: {response.StatusCode}");
+            Console.WriteLine($"Message:\n{response.Message}");
         }
     }
 }

@@ -2,6 +2,7 @@
 {
     public enum OrderStatus
     {
+        NONE,
         IN_PROGRESS,
         SHIPPED,
         IN_BACKORDER,

@@ -41,6 +41,7 @@ namespace ChannelEngineConsoleApp
                         .AddDefaultHeader("User-Agent", config["AppConfig:UserAgent"])
                         .AddDefaultHeader("X-CE-KEY", config["ChEng:ApiKey"])
                         .UseNewtonsoftJson())
+                .AddTransient<IOrdersService, OrdersService>()
                 .AddSingleton<IChannelEngineServiceWrapper, ChannelEngineServiceWrapper>()
                 .AddHostedService<AppHost>();
         }

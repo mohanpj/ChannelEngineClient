@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
+
 using Contracts;
+
 using Microsoft.Extensions.Configuration;
+
 using Models;
+
 using RestSharp;
 
 namespace Services
@@ -21,8 +25,13 @@ namespace Services
         public async Task<ResponseWrapper<Order>> GetAllWithStatusAsync(OrderStatus status)
         {
             var statusName = Enum.GetName(typeof(OrderStatus), status);
+
             var request = new RestRequest(_config["ApiConfig:OrdersEndpoint"]);
-            request.AddQueryParameter("statuses", statusName);
+
+            if (statusName != null && status != OrderStatus.NONE)
+            {
+                request.AddQueryParameter("statuses", statusName);
+            }
 
             var response = await _restClient.GetAsync<ResponseWrapper<Order>>(request);
 

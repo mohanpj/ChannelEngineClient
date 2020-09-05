@@ -2,11 +2,16 @@
 
 namespace Models
 {
-    public class ResponseWrapper<T>
+    public class BaseResponseWrapper
     {
-        public IEnumerable<T> Content { get; set; }
         public bool Success { get; set; }
         public int StatusCode { get; set; }
         public string Message { get; set; }
+    }
+
+    public class ResponseWrapper<T> : BaseResponseWrapper
+    {
+        public IEnumerable<T> Content { get; set; }
+        public int Count { get; set; }
     }
 }
