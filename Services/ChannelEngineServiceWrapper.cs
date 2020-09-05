@@ -1,21 +1,21 @@
-﻿using System.Net.Http;
-
-using Contracts;
-
+﻿using Contracts;
 using Microsoft.Extensions.Configuration;
+using RestSharp;
 
 namespace Services
 {
     public class ChannelEngineServiceWrapper : IChannelEngineServiceWrapper
     {
-        private readonly HttpClient _httpClient;
+        private readonly IConfiguration _config;
+        private readonly IRestClient _httpClient;
         private IOrdersService _orders;
 
-        public ChannelEngineServiceWrapper(HttpClient httpClient)
+        public ChannelEngineServiceWrapper(IRestClient httpClient, IConfiguration config)
         {
             _httpClient = httpClient;
+            _config = config;
         }
 
-        public IOrdersService Orders => _orders ??= new OrdersService(_httpClient);
+        public IOrdersService Orders => _orders ??= new OrdersService(_httpClient, _config);
     }
 }

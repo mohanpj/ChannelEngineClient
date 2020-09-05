@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace Models
 {
@@ -9,7 +8,6 @@ namespace Models
         public string Status { get; set; }
         public string ChannelName { get; set; }
         public string GlobalChannelName { get; set; }
-        [JsonPropertyName("Lines")]
-        public ICollection<Product> Products { get; set; }
+        public ICollection<ProductLine> Lines { get; set; }
     }
 }

@@ -11,6 +11,6 @@
         CLOSED,
         NEW,
         RETURNED,
-        REQUIRES_CORRECTION,
+        REQUIRES_CORRECTION
     }
 }

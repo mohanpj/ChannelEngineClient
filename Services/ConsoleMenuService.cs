@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Contracts;
 using Models;
 
@@ -18,12 +17,9 @@ namespace Services
 
         public async Task DrawMenuAsync()
         {
-            bool showMenu = true;
+            var showMenu = true;
 
-            while (showMenu)
-            {
-                showMenu = await MainMenu();
-            }
+            while (showMenu) showMenu = await MainMenu();
         }
 
         private async Task<bool> MainMenu()
@@ -62,7 +58,7 @@ namespace Services
         private async Task ShowAllOrdersWithStatus()
         {
             var status = SelectOrderStatus();
-            
+
             Console.Clear();
             Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
 
@@ -71,23 +67,16 @@ namespace Services
             if (response.Success)
             {
                 if (response.Content.Any())
-                {
                     foreach (var order in response.Content)
-                    {
-                        Console.WriteLine($"{order.Id, -5}|{order.ChannelName, -20}|{order.Products.Sum(p => p.Quantity), -10}");
-                    }
-                }
+                        Console.WriteLine(
+                            $"{order.Id,-5}|{order.ChannelName,-20}|{order.Lines.Sum(p => p.Quantity),-10}");
                 else
-                {
                     Console.WriteLine("No data to display.");
-                }
-
             }
             else
             {
                 HandleError(response.Message);
             }
-            
 
             Console.WriteLine();
             Console.WriteLine("Press any key to return to main menu...");
@@ -100,15 +89,12 @@ namespace Services
             Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
 
             var orderStatusNames = Enum.GetNames(typeof(OrderStatus));
-            for (int i = 1; i <= orderStatusNames.Length; i++)
-            {
-                Console.WriteLine($"{i-1}) {orderStatusNames[i-1]}");
-            }
+            for (var i = 1; i <= orderStatusNames.Length; i++) Console.WriteLine($"{i - 1}) {orderStatusNames[i - 1]}");
             Console.WriteLine();
             Console.WriteLine("Select status:");
             var key = Console.ReadLine();
             OrderStatus result;
-            
+
             while (!Enum.TryParse(key, out result))
             {
                 Console.WriteLine("Invalid status selected. Try again");

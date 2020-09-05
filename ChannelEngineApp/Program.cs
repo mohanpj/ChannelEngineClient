@@ -1,53 +1,48 @@
-﻿using System;
-using System.Net.Http;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Contracts;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.Extensions.Hosting;
+using RestSharp;
+using RestSharp.Serializers.NewtonsoftJson;
 using Services;
 
 namespace ChannelEngineConsoleApp
 {
-    static class Program
+    internal static class Program
     {
-        private static IConfiguration _config;
-        private static IServiceProvider _services;
-        private static readonly HttpClient HttpClient = new HttpClient();
-
-        static async Task Main(string[] args)
+        private static async Task Main(string[] args)
         {
-            CreateConfiguration();
-            ConfigureServices();
-            ConfigureClient();
-
-            await _services.GetService<AppHost>().RunAsync();
+            await CreateHostBuilder(args).Build().RunAsync();
         }
 
-        private static void CreateConfiguration()
+        private static IHostBuilder CreateHostBuilder(string[] args)
         {
-            _config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddUserSecrets(Assembly.GetCallingAssembly())
-                .Build();
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration(CreateConfiguration)
+                .ConfigureServices(RegisterServices);
         }
 
-        private static void ConfigureServices()
+        private static void CreateConfiguration(HostBuilderContext hostContext, IConfigurationBuilder config)
         {
-            _services = new ServiceCollection()
-                .AddScoped<IChannelEngineServiceWrapper, ChannelEngineServiceWrapper>(provider => new ChannelEngineServiceWrapper(HttpClient))
+            var env = hostContext.HostingEnvironment;
+            config.AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true)
+                .AddUserSecrets(typeof(Program).Assembly);
+        }
+
+        private static void RegisterServices(HostBuilderContext hostContext, IServiceCollection services)
+        {
+            var config = hostContext.Configuration;
+            services
                 .AddSingleton<IConsoleMenuService, ConsoleMenuService>()
-                .AddSingleton<AppHost>()
-                .BuildServiceProvider();
-        }
-
-        private static void ConfigureClient()
-        {
-            HttpClient.BaseAddress = new Uri($"{_config["AppConfig:ApiBaseUri"]}{_config["AppConfig:ApiVersion"]}");
-            HttpClient.DefaultRequestHeaders.Add("User-Agent", _config["AppConfig:UserAgent"]);
-            HttpClient.DefaultRequestHeaders.Add("X-CE-KEY", _config["ChEng:ApiKey"]);
+                .AddSingleton(provider =>
+                    new RestClient($"{config["AppConfig:ApiBaseUri"]}{config["AppConfig:ApiVersion"]}")
+                        .AddDefaultHeader("User-Agent", config["AppConfig:UserAgent"])
+                        .AddDefaultHeader("X-CE-KEY", config["ChEng:ApiKey"])
+                        .UseNewtonsoftJson())
+                .AddSingleton<IChannelEngineServiceWrapper, ChannelEngineServiceWrapper>()
+                .AddHostedService<AppHost>();
         }
     }
 }
