@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
@@ -18,10 +19,11 @@ namespace Services
             _httpClient = httpClient;
         }
 
-        public async Task<ResponseWrapper<Order>> GetAllWithStatusAsync(string status)
+        public async Task<ResponseWrapper<Order>> GetAllWithStatusAsync(OrderStatus status)
         {
+            var statusName = Enum.GetName(typeof(OrderStatus), status);
             var query = HttpUtility.ParseQueryString(string.Empty);
-            query["statuses"] = status;
+            query["statuses"] = statusName;
 
             var response = await _httpClient.GetAsync($"orders?{query}");
 
