@@ -2,40 +2,43 @@
 using System.Threading.Tasks;
 
 using Contracts;
-
-using Microsoft.Extensions.Configuration;
-
+using Contracts.ApiClient;
 using Models;
 
 using RestSharp;
 
 namespace Services
 {
-    public class OrdersService : IOrdersService
+    public class OrdersService : ApiEndpointBase, IOrdersService
     {
-        private readonly IConfiguration _config;
-        private readonly IRestClient _restClient;
+        private readonly ISharedApiConfigurationProvider _sharedConfig;
 
-        public OrdersService(IRestClient restClient, IConfiguration config)
+        public OrdersService(IChannelEngineApiClientFactory clientFactory, ISharedApiConfigurationProvider sharedConfig)
+            :base(clientFactory)
         {
-            _restClient = restClient;
-            _config = config;
+            _sharedConfig = sharedConfig;
         }
 
         public async Task<ResponseWrapper<Order>> GetAllWithStatusAsync(OrderStatus status)
         {
             var statusName = Enum.GetName(typeof(OrderStatus), status);
 
-            var request = new RestRequest(_config["ApiConfig:OrdersEndpoint"]);
+            var request = CreateRequest();
 
             if (statusName != null && status != OrderStatus.NONE)
             {
                 request.AddQueryParameter("statuses", statusName);
             }
 
-            var response = await _restClient.GetAsync<ResponseWrapper<Order>>(request);
+            var response = await Client.GetAsync<ResponseWrapper<Order>>(request);
 
             return response;
+        }
+
+        protected override IRestRequest CreateRequest()
+        {
+            return new RestRequest(_sharedConfig.OrdersEndpoint)
+                .AddHeader("X-CE-KEY", _sharedConfig.ApiToken);
         }
     }
 }

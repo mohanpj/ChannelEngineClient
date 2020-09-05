@@ -1,0 +1,9 @@
+{
+  "ApiConfig": {
+    "BaseUri": "",
+    "ApiVersion": "v2",
+    "ApiToken": "",
+    "OrdersEndpoint": "orders",
+    "ProductsEndpoint": "products" 
+  }  
+}

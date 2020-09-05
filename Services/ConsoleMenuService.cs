@@ -224,6 +224,9 @@ namespace Services
             Console.WriteLine("Something went wrong.");
             Console.WriteLine($"Status Code: {response.StatusCode}");
             Console.WriteLine($"Message:\n{response.Message}");
+            Console.WriteLine();
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
     }
 }

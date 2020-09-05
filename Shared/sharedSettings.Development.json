@@ -1,0 +1,5 @@
+{
+  "ApiConfig": {
+    "BaseUri": "https://api-dev.channelengine.net/api"
+  }
+}
