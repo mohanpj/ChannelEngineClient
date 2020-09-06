@@ -1,16 +1,17 @@
-﻿using Contracts.ApiClient;
+﻿using System;
+using Contracts.ApiClient;
 using Contracts.ApiClient.Factories;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 
-namespace Services.ApiClient.Factories
+namespace Repository.API.Factories
 {
     public class ChannelEngineApiClientFactory : IChannelEngineApiClientFactory
     {
-        private readonly string _apiUrl;
+        private readonly Uri _apiUrl;
         public ChannelEngineApiClientFactory(ISharedApiConfigurationProvider configProvider)
         {
-            _apiUrl = $"{configProvider.BaseUri}/{configProvider.ApiVersion}";
+            _apiUrl = new Uri($"{configProvider.BaseUri}/{configProvider.ApiVersion}", UriKind.Absolute);
         }
 
         public IRestClient CreateClient()

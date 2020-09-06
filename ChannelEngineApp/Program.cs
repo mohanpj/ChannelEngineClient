@@ -1,13 +1,12 @@
 ﻿using System.Threading.Tasks;
+using ChannelEngineConsoleApp.Services;
 using Contracts;
+using Contracts.Console;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Models;
-using Services;
-using Services.ApiClient.Commands;
-using Services.ApiClient.Handlers;
 using Shared;
 
 namespace ChannelEngineConsoleApp
@@ -29,8 +28,7 @@ namespace ChannelEngineConsoleApp
         private static void CreateConfiguration(HostBuilderContext hostContext, IConfigurationBuilder config)
         {
             var env = hostContext.HostingEnvironment;
-            config
-                .AddEnvironmentVariables("DOTNET_")
+            config.AddEnvironmentVariables("DOTNET_")
                 .AddSharedConfiguration(env)
                 .AddJsonFile("appsettings.json", true, true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true);
@@ -40,9 +38,7 @@ namespace ChannelEngineConsoleApp
         {
             services.AddSharedServices(hostContext.Configuration)
                 .AddSingleton<IConsoleMenuService, ConsoleMenuService>()
-                .AddMediatR(typeof(AppHost))
-                .AddTransient<IRequestHandler<GetAllOrdersByStatusQuery, ResponseWrapper<Order>>,
-                    GetAllOrdersByStatusHandler>()
+                .AddSingleton<IConsolePrintingService, ConsolePrintingService>()
                 .AddHostedService<AppHost>();
         }
     }

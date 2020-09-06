@@ -3,7 +3,7 @@ using Models;
 
 namespace Contracts
 {
-    public interface IOrdersService
+    public interface IOrdersRepository
     {
         Task<ResponseWrapper<Order>> GetAllOrdersWithStatus(OrderStatus status);
     }

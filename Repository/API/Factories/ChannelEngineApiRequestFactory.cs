@@ -2,7 +2,7 @@
 using Contracts.ApiClient.Factories;
 using RestSharp;
 
-namespace Services.ApiClient.Factories
+namespace Repository.API.Factories
 {
     public class ChannelEngineApiRequestFactory : IChannelEngineApiRequestFactory
     {

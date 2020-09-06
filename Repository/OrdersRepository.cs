@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
-
 using Contracts;
 using Contracts.ApiClient;
 using Contracts.ApiClient.Factories;
 using Models;
-
 using RestSharp;
 
-namespace Services
+namespace Repository
 {
-    public class OrdersService : ApiEndpointBase, IOrdersService
+    public class OrdersRepository : ApiEndpointBase, IOrdersRepository
     {
-        public OrdersService(
+        public OrdersRepository(
             IChannelEngineApiRequestFactory requestFactory,
             IChannelEngineApiClientFactory clientFactory,
             ISharedApiConfigurationProvider configurationProvider)

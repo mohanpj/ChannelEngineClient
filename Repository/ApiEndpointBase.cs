@@ -1,7 +1,7 @@
 ﻿using Contracts.ApiClient;
 using Contracts.ApiClient.Factories;
 
-namespace Services
+namespace Repository
 {
     public abstract class ApiEndpointBase
     {

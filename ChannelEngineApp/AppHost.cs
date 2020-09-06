@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Contracts;
+using Contracts.Console;
 using Microsoft.Extensions.Hosting;
 
 namespace ChannelEngineConsoleApp
@@ -9,11 +10,11 @@ namespace ChannelEngineConsoleApp
     public class AppHost : IHostedService
     {
         private readonly IHostApplicationLifetime _applicationLifetime;
-        private readonly IConsoleMenuService _consoleMenuService;
+        private readonly IConsoleMenuService _consoleService;
 
-        public AppHost(IConsoleMenuService consoleMenuService, IHostApplicationLifetime applicationLifetime)
+        public AppHost(IConsoleMenuService consoleService, IHostApplicationLifetime applicationLifetime)
         {
-            _consoleMenuService = consoleMenuService;
+            _consoleService = consoleService;
             _applicationLifetime = applicationLifetime;
         }
 
@@ -33,7 +34,7 @@ namespace ChannelEngineConsoleApp
             try
             {
                 _applicationLifetime.ApplicationStarted.WaitHandle.WaitOne();
-                await _consoleMenuService.DrawMenuAsync();
+                await _consoleService.RunAsync();
             }
             catch (Exception ex)
             {

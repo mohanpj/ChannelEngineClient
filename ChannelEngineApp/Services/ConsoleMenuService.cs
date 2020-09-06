@@ -2,40 +2,43 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using ConsoleTables;
-
-using Contracts;
+using Contracts.Console;
 using MediatR;
 using Models;
-using Services.ApiClient.Commands;
+using Repository.API.Commands;
 
-namespace Services
+namespace ChannelEngineConsoleApp.Services
 {
     public class ConsoleMenuService : IConsoleMenuService
     {
         private readonly IMediator _mediator;
-        public ConsoleMenuService(IMediator mediator)
+        private readonly IConsolePrintingService _printer;
+
+        public ConsoleMenuService(IMediator mediator, IConsolePrintingService printer)
         {
             _mediator = mediator;
+            _printer = printer;
         }
 
-        public async Task DrawMenuAsync()
+        public async Task RunAsync()
         {
-            var showMenu = true;
-
-            while (showMenu) showMenu = await MainMenu();
+            bool showMenu = true;
+            while (showMenu)
+            {
+                showMenu = await MainMenu();
+            }
         }
 
         private async Task<bool> MainMenu()
         {
-            Console.Clear();
-            Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
-            Console.WriteLine("Choose option:");
-            Console.WriteLine("1) Get all orders with status");
-            Console.WriteLine("2) Set product quantity to 25");
-            Console.WriteLine("0) EXIT");
-            Console.WriteLine();
+            _printer.Clear();
+            _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
+            _printer.WriteLine("Choose option:");
+            _printer.WriteLine("1) Get all orders with status");
+            _printer.WriteLine("2) Set product quantity to 25");
+            _printer.WriteLine("0) EXIT");
+            _printer.WriteLine();
             var key = Console.ReadKey().Key;
 
             switch (key)
@@ -49,8 +52,8 @@ namespace Services
                 case ConsoleKey.D0:
                     return false;
                 default:
-                    Console.WriteLine();
-                    Console.WriteLine("Invalid option selected. Try again.");
+                    _printer.WriteLine();
+                    _printer.WriteLine("Invalid option selected. Try again.");
                     Console.ReadKey();
                     return true;
             }
@@ -60,8 +63,8 @@ namespace Services
         {
             var status = SelectOrderStatus();
 
-            Console.Clear();
-            Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
+            _printer.Clear();
+            _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
 
             var query = new GetAllOrdersByStatusQuery(status);
             var response = await _mediator.Send(query);
@@ -75,22 +78,22 @@ namespace Services
                     {
                         table.AddRow(order.Id, order.ChannelName, order.Lines.Sum(l => l.Quantity));
                     }
-                    table.Write(Format.Minimal);
+                    _printer.WriteTable(table, Format.Minimal);
                 }
                 else
                 {
-                    Console.WriteLine("No data to display.");
-                    Console.WriteLine();
-                    Console.WriteLine("Press any key to return...");
+                    _printer.WriteLine("No data to display.");
+                    _printer.WriteLine();
+                    _printer.WriteLine("Press any key to return...");
                     Console.ReadKey();
                     return;
                 }
 
                 while (true)
                 {
-                    Console.WriteLine("1) Get top 5 products sold");
-                    Console.WriteLine("0) BACK");
-                    Console.WriteLine();
+                    _printer.WriteLine("1) Get top 5 products sold");
+                    _printer.WriteLine("0) BACK");
+                    _printer.WriteLine();
                     var key = Console.ReadKey().Key;
                     
                     switch (key)
@@ -116,29 +119,36 @@ namespace Services
 
         private OrderStatus SelectOrderStatus()
         {
-            Console.Clear();
-            Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
-            Console.WriteLine("Available statuses");
+            _printer.Clear();
+            _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
+            _printer.WriteLine("Available statuses");
             
             var orderStatusNames = Enum.GetNames(typeof(OrderStatus));
             
             for (var i = 1; i <= orderStatusNames.Length; i++)
             {
-                Console.WriteLine($"{i - 1}) {orderStatusNames[i - 1]}");
+                _printer.WriteLine($"{i - 1}) {orderStatusNames[i - 1]}");
             }
             
-            Console.WriteLine();
-            Console.WriteLine("Select status:");
+            _printer.WriteLine();
+            _printer.WriteLine("Select status:");
             
             var key = Console.ReadLine();
 
-            while (int.TryParse(key, out int keyValue) && !Enum.IsDefined(typeof(OrderStatus), keyValue))
+            while (!InputIsValid(key))
             {
-                Console.WriteLine("Invalid status selected. Try again");
+                _printer.WriteLine("Invalid status selected. Try again");
                 key = Console.ReadLine();
             }
             
             return Enum.Parse<OrderStatus>(key!);
+        }
+
+        private static bool InputIsValid(string key)
+        {
+            return key != string.Empty &&
+                   int.TryParse(key, out int keyValue) &&
+                   Enum.IsDefined(typeof(OrderStatus), keyValue);
         }
 
         private void ShowTopFiveProducts(IEnumerable<Order> orders)
@@ -148,8 +158,8 @@ namespace Services
                 .Take(5)
                 .ToArray();
 
-            Console.Clear();
-            Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
+            _printer.Clear();
+            _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
 
             var table = new ConsoleTable("ID", "Name", "Ean", "Quantity");
             foreach (var product in products)
@@ -159,7 +169,7 @@ namespace Services
 
             table.Write(Format.Minimal);
 
-            Console.WriteLine("Press any key to return to main menu...");
+            _printer.WriteLine("Press any key to return to main menu...");
             Console.ReadKey();
         }
 
@@ -167,16 +177,16 @@ namespace Services
         {
             while (true)
             {
-                Console.Clear();
-                Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
-                Console.WriteLine("Choose product:");
-                Console.WriteLine("1) Dummy product1");
-                Console.WriteLine("2) Dummy product2");
-                Console.WriteLine("3) Dummy product3");
-                Console.WriteLine("4) Dummy product4");
-                Console.WriteLine("5) Dummy product5");
-                Console.WriteLine("0) BACK");
-                Console.WriteLine();
+                _printer.Clear();
+                _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
+                _printer.WriteLine("Choose product:");
+                _printer.WriteLine("1) Dummy product1");
+                _printer.WriteLine("2) Dummy product2");
+                _printer.WriteLine("3) Dummy product3");
+                _printer.WriteLine("4) Dummy product4");
+                _printer.WriteLine("5) Dummy product5");
+                _printer.WriteLine("0) BACK");
+                _printer.WriteLine();
 
                 var key = Console.ReadKey().Key;
 
@@ -200,8 +210,8 @@ namespace Services
                     case ConsoleKey.D0:
                         break;
                     default:
-                        Console.WriteLine();
-                        Console.WriteLine("Invalid option selected. Press any key to try again.");
+                        _printer.WriteLine();
+                        _printer.WriteLine("Invalid option selected. Press any key to try again.");
                         Console.ReadKey();
                         continue;
                 }
@@ -212,21 +222,21 @@ namespace Services
 
         private void UpdateProductStock(string productName)
         {
-            Console.Clear();
-            Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
-            Console.WriteLine($"{productName} stock has been updated.");
-            Console.WriteLine();
-            Console.WriteLine("Press any key to return to main menu...");
+            _printer.Clear();
+            _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
+            _printer.WriteLine($"{productName} stock has been updated.");
+            _printer.WriteLine();
+            _printer.WriteLine("Press any key to return to main menu...");
             Console.ReadKey();
         }
 
         private void HandleError(BaseResponseWrapper response)
         {
-            Console.WriteLine("Something went wrong.");
-            Console.WriteLine($"Status Code: {response.StatusCode}");
-            Console.WriteLine($"Message:\n{response.Message}");
-            Console.WriteLine();
-            Console.WriteLine("Press any key to continue...");
+            _printer.WriteLine("Something went wrong.");
+            _printer.WriteLine($"Status Code: {response.StatusCode}");
+            _printer.WriteLine($"Message:\n{response.Message}");
+            _printer.WriteLine();
+            _printer.WriteLine("Press any key to continue...");
             Console.ReadKey();
         }
     }

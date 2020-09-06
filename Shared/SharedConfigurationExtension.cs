@@ -3,13 +3,15 @@
 using Contracts;
 using Contracts.ApiClient;
 using Contracts.ApiClient.Factories;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
-using Services;
-using Services.ApiClient;
-using Services.ApiClient.Factories;
+using Models;
+using Repository;
+using Repository.API.Commands;
+using Repository.API.Factories;
+using Repository.API.Handlers;
 
 namespace Shared
 {
@@ -19,11 +21,14 @@ namespace Shared
         {
             var sharedApiConfig = new SharedApiConfigurationProvider();
             config.GetSection(SharedApiConfigurationProvider.SettingsRoot).Bind(sharedApiConfig);
-            services.AddSingleton<ISharedApiConfigurationProvider, SharedApiConfigurationProvider>(provider => sharedApiConfig)
-                .AddSingleton<IChannelEngineServiceWrapper, ChannelEngineServiceWrapper>()
+            services.AddMediatR(typeof(GetAllOrdersByStatusQuery).Assembly)
+                .AddSingleton<ISharedApiConfigurationProvider, SharedApiConfigurationProvider>(provider => sharedApiConfig)
+                .AddSingleton<IRequestHandler<GetAllOrdersByStatusQuery, ResponseWrapper<Order>>,
+                    GetAllOrdersByStatusHandler>()
+                .AddSingleton<IChannelEngineRepositoryWrapper, ChannelEngineRepositoryWrapper>()
                 .AddSingleton<IChannelEngineApiClientFactory, ChannelEngineApiClientFactory>()
                 .AddSingleton<IChannelEngineApiRequestFactory, ChannelEngineApiRequestFactory>()
-                .AddTransient<IOrdersService, OrdersService>();
+                .AddTransient<IOrdersRepository, OrdersRepository>();
 
             return services;
         }

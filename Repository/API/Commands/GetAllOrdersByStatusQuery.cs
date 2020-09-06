@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Reflection.Metadata.Ecma335;
-using Contracts;
-using MediatR;
+﻿using MediatR;
 using Models;
 
-namespace Services.ApiClient.Commands
+namespace Repository.API.Commands
 {
     public class GetAllOrdersByStatusQuery : IRequest<ResponseWrapper<Order>>
     {

@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 
-namespace Contracts
+namespace Contracts.Console
 {
     public interface IConsoleMenuService
     {
-        Task DrawMenuAsync();
+        Task RunAsync();
     }
 }
