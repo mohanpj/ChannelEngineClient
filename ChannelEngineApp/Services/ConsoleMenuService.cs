@@ -7,6 +7,7 @@ using Contracts.Console;
 using MediatR;
 using Models;
 using Repository.API.Commands;
+using Shared.Extensions;
 
 namespace ChannelEngineConsoleApp.Services
 {
@@ -66,15 +67,16 @@ namespace ChannelEngineConsoleApp.Services
             _printer.Clear();
             _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
 
-            var query = new GetAllOrdersByStatusQuery(status);
-            var response = await _mediator.Send(query);
-
-            if (response.Success)
+            try
             {
-                if (response.Content.Any())
+                var query = new GetAllOrdersByStatusQuery(status);
+                var result = await _mediator.Send(query);
+                var response = result.ToArray();
+
+                if (response.Any())
                 {
                     var table = new ConsoleTable("ID", "Channel name", "No of products");
-                    foreach (var order in response.Content)
+                    foreach (var order in response)
                     {
                         table.AddRow(order.Id, order.ChannelName, order.Lines.Sum(l => l.Quantity));
                     }
@@ -95,11 +97,11 @@ namespace ChannelEngineConsoleApp.Services
                     _printer.WriteLine("0) BACK");
                     _printer.WriteLine();
                     var key = Console.ReadKey().Key;
-                    
+                
                     switch (key)
                     {
                         case ConsoleKey.D1:
-                            ShowTopFiveProducts(response.Content);
+                            ShowTopFiveProducts(response);
                             break;
                         case ConsoleKey.D0:
                             break;
@@ -111,9 +113,9 @@ namespace ChannelEngineConsoleApp.Services
                     break;
                 }
             }
-            else
+            catch(ChannelEngineApiClientException apiClientException)
             {
-                HandleError(response);
+                HandleException(apiClientException);
             }
         }
 
@@ -230,11 +232,11 @@ namespace ChannelEngineConsoleApp.Services
             Console.ReadKey();
         }
 
-        private void HandleError(BaseResponseWrapper response)
+        private void HandleException(ChannelEngineApiClientException ex)
         {
             _printer.WriteLine("Something went wrong.");
-            _printer.WriteLine($"Status Code: {response.StatusCode}");
-            _printer.WriteLine($"Message:\n{response.Message}");
+            _printer.WriteLine($"Status Code: {ex.StatusCode}");
+            _printer.WriteLine($"Message:\n{ex.Message}");
             _printer.WriteLine();
             _printer.WriteLine("Press any key to continue...");
             Console.ReadKey();

@@ -1,9 +1,10 @@
-﻿using MediatR;
+﻿using System.Collections.Generic;
+using MediatR;
 using Models;
 
 namespace Repository.API.Commands
 {
-    public class GetAllOrdersByStatusQuery : IRequest<ResponseWrapper<Order>>
+    public class GetAllOrdersByStatusQuery : IRequest<IEnumerable<Order>>
     {
         public GetAllOrdersByStatusQuery(OrderStatus status)
         {

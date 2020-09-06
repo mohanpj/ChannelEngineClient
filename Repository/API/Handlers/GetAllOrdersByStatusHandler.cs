@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Contracts;
 using MediatR;
@@ -7,7 +8,7 @@ using Repository.API.Commands;
 
 namespace Repository.API.Handlers
 {
-    public class GetAllOrdersByStatusHandler : IRequestHandler<GetAllOrdersByStatusQuery, ResponseWrapper<Order>>
+    public class GetAllOrdersByStatusHandler : IRequestHandler<GetAllOrdersByStatusQuery, IEnumerable<Order>>
     {
         private readonly IChannelEngineRepositoryWrapper _channelEngineRepository;
 
@@ -16,9 +17,9 @@ namespace Repository.API.Handlers
             _channelEngineRepository = channelEngineRepository;
         }
 
-        public async Task<ResponseWrapper<Order>> Handle(GetAllOrdersByStatusQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Order>> Handle(GetAllOrdersByStatusQuery request, CancellationToken cancellationToken)
         {
-            var orders = await _channelEngineRepository.Orders.GetAllOrdersWithStatus(request.Status);
+            var orders = await _channelEngineRepository.OrdersRepository.GetAllOrdersWithStatus(request.Status);
             return orders;
         }
     }

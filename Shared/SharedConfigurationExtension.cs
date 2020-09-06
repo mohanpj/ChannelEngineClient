@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 
 using Contracts;
 using Contracts.ApiClient;
@@ -21,14 +22,15 @@ namespace Shared
         {
             var sharedApiConfig = new SharedApiConfigurationProvider();
             config.GetSection(SharedApiConfigurationProvider.SettingsRoot).Bind(sharedApiConfig);
-            services.AddMediatR(typeof(GetAllOrdersByStatusQuery).Assembly)
+            services.AddMediatR(typeof(GetAllOrdersByStatusHandler).Assembly)
+                .AddTransient<IOrdersRepository, OrdersRepository>()
+                .AddTransient<IProductsRepository, ProductsRepository>()
                 .AddSingleton<ISharedApiConfigurationProvider, SharedApiConfigurationProvider>(provider => sharedApiConfig)
-                .AddSingleton<IRequestHandler<GetAllOrdersByStatusQuery, ResponseWrapper<Order>>,
-                    GetAllOrdersByStatusHandler>()
                 .AddSingleton<IChannelEngineRepositoryWrapper, ChannelEngineRepositoryWrapper>()
                 .AddSingleton<IChannelEngineApiClientFactory, ChannelEngineApiClientFactory>()
                 .AddSingleton<IChannelEngineApiRequestFactory, ChannelEngineApiRequestFactory>()
-                .AddTransient<IOrdersRepository, OrdersRepository>();
+                .AddSingleton<IRequestHandler<GetAllOrdersByStatusQuery, IEnumerable<Order>>,
+                    GetAllOrdersByStatusHandler>();
 
             return services;
         }

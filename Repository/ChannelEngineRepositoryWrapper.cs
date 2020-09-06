@@ -4,11 +4,14 @@ namespace Repository
 {
     public class ChannelEngineRepositoryWrapper : IChannelEngineRepositoryWrapper
     {
-        public IOrdersRepository Orders { get; }
+        public IOrdersRepository OrdersRepository { get; }
+        public IProductsRepository Products { get; }
 
-        public ChannelEngineRepositoryWrapper(IOrdersRepository orders)
+        public ChannelEngineRepositoryWrapper(IOrdersRepository ordersRepository,
+            IProductsRepository productsRepository)
         {
-            Orders = orders;
+            OrdersRepository = ordersRepository;
+            Products = productsRepository;
         }
     }
 }

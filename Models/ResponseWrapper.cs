@@ -4,7 +4,7 @@ namespace Models
 {
     public class ResponseWrapper<T> : BaseResponseWrapper
     {
-        public IEnumerable<T> Content { get; set; }
+        public T Content { get; set; }
         public int Count { get; set; }
     }
 }

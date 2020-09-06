@@ -1,12 +1,9 @@
 ﻿using System.Threading.Tasks;
 using ChannelEngineConsoleApp.Services;
-using Contracts;
 using Contracts.Console;
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Models;
 using Shared;
 
 namespace ChannelEngineConsoleApp
@@ -36,9 +33,9 @@ namespace ChannelEngineConsoleApp
 
         private static void RegisterServices(HostBuilderContext hostContext, IServiceCollection services)
         {
-            services.AddSharedServices(hostContext.Configuration)
+            services.AddSingleton<IConsolePrintingService, ConsolePrintingService>()
                 .AddSingleton<IConsoleMenuService, ConsoleMenuService>()
-                .AddSingleton<IConsolePrintingService, ConsolePrintingService>()
+                .AddSharedServices(hostContext.Configuration)
                 .AddHostedService<AppHost>();
         }
     }
