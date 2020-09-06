@@ -13,6 +13,7 @@ using Repository;
 using Repository.API.Commands;
 using Repository.API.Factories;
 using Repository.API.Handlers;
+using Repository.API.Queries;
 
 namespace Shared
 {
@@ -23,17 +24,12 @@ namespace Shared
             var sharedApiConfig = new SharedApiConfigurationProvider();
             config.GetSection(SharedApiConfigurationProvider.SettingsRoot).Bind(sharedApiConfig);
             services.AddMediatR(typeof(GetAllOrdersByStatusHandler).Assembly)
-                .AddTransient<IOrdersRepository, OrdersRepository>()
-                .AddTransient<IProductsRepository, ProductsRepository>()
                 .AddSingleton<ISharedApiConfigurationProvider, SharedApiConfigurationProvider>(provider =>
                     sharedApiConfig)
-                .AddSingleton<IChannelEngineRepositoryWrapper, ChannelEngineRepositoryWrapper>()
-                .AddSingleton<IChannelEngineApiClientFactory, ChannelEngineApiClientFactory>()
-                .AddSingleton<IChannelEngineApiRequestFactory, ChannelEngineApiRequestFactory>()
-                .AddSingleton<IRequestHandler<GetAllOrdersByStatusQuery, IEnumerable<Order>>,
-                    GetAllOrdersByStatusHandler>()
-                .AddSingleton<IRequestHandler<GetTopSoldProductsFromOrders, IEnumerable<TopProductDto>>,
-                    GetTopSoldProductsHandler>();
+                .AddRepositories()
+                .AddFactories()
+                .AddRequestHandlers();
+                
 
             return services;
         }
@@ -53,5 +49,22 @@ namespace Shared
 
             return config;
         }
+
+        private static IServiceCollection AddRequestHandlers(this IServiceCollection services) =>
+            services.AddSingleton<IRequestHandler<GetAllOrdersByStatusQuery, IEnumerable<Order>>,
+                    GetAllOrdersByStatusHandler>()
+                .AddSingleton<IRequestHandler<GetTopSoldProductsFromOrdersQuery, IEnumerable<TopProductDto>>,
+                    GetTopSoldProductsHandler>()
+                .AddSingleton<IRequestHandler<UpdateProductStockCommand, Product>, UpdateProductStockHandler>();
+
+        private static IServiceCollection AddFactories(this IServiceCollection services) =>
+            services.AddSingleton<IChannelEngineApiClientFactory, ChannelEngineApiClientFactory>()
+                .AddSingleton<IChannelEngineApiRequestFactory, ChannelEngineApiRequestFactory>();
+
+        private static IServiceCollection AddRepositories(this IServiceCollection services) =>
+            services.AddTransient<IOrdersRepository, OrdersRepository>()
+                .AddTransient<IProductsRepository, ProductsRepository>()
+                .AddSingleton<IChannelEngineRepositoryWrapper, ChannelEngineRepositoryWrapper>();
+
     }
 }

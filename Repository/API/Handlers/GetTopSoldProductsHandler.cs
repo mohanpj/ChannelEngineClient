@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 using Contracts;
 using MediatR;
 using Models;
-using Repository.API.Commands;
-using RestSharp.Validation;
+using Repository.API.Queries;
 
 namespace Repository.API.Handlers
 {
-    public class GetTopSoldProductsHandler : IRequestHandler<GetTopSoldProductsFromOrders, IEnumerable<TopProductDto>>
+    public class
+        GetTopSoldProductsHandler : IRequestHandler<GetTopSoldProductsFromOrdersQuery, IEnumerable<TopProductDto>>
     {
         private readonly IChannelEngineRepositoryWrapper _repository;
 
@@ -19,12 +19,13 @@ namespace Repository.API.Handlers
             _repository = repository;
         }
 
-        public async Task<IEnumerable<TopProductDto>> Handle(GetTopSoldProductsFromOrders request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<TopProductDto>> Handle(GetTopSoldProductsFromOrdersQuery request,
+            CancellationToken cancellationToken)
         {
             var productIds = request.Orders.SelectMany(o => o.Lines)
                 .Select(l => l.MerchantProductNo)
                 .Distinct();
-            
+
             var products = await _repository.Products.GetProductsByMerchantNo(productIds);
 
             var quantityAggregate = request.Orders.SelectMany(o => o.Lines)
@@ -32,14 +33,13 @@ namespace Repository.API.Handlers
                 .Take(5)
                 .ToArray();
 
-            var result = products.Content
-                .Join(quantityAggregate,
+            var result = products.Join(quantityAggregate,
                     product => product.MerchantProductNo,
                     qa => qa.Key,
                     (product, qa) => new TopProductDto(product, qa.Value))
                 .OrderByDescending(p => p.TotalSold)
                 .ThenBy(p => p.Name);
-            
+
             return result;
         }
 

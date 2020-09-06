@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Contracts;
 using MediatR;
 using Models;
-using Repository.API.Commands;
+using Repository.API.Queries;
 
 namespace Repository.API.Handlers
 {

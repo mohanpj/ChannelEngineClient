@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Contracts;
 using Contracts.ApiClient;
 using Contracts.ApiClient.Factories;
+using Microsoft.AspNetCore.JsonPatch;
 using Models;
 using RestSharp;
 
@@ -20,7 +21,7 @@ namespace Repository
         {
         }
 
-        public async Task<ResponseWrapper<IEnumerable<Product>>> GetProductsByMerchantNo(IEnumerable<string> productIds)
+        public async Task<IEnumerable<Product>> GetProductsByMerchantNo(IEnumerable<string> productIds)
         {
             var request = RequestFactory
                 .CreateRequest(SharedConfig.ProductsEndpoint)
@@ -28,21 +29,44 @@ namespace Repository
             
             var result = await ClientFactory
                 .CreateClient()
-                .GetAsync<ResponseWrapper<IEnumerable<Product>>>(request);
+                .ExecuteGetAsync<ResponseWrapper<IEnumerable<Product>>>(request);
             
-            return result;
+            EnsureSuccess(result);
+            
+            return result.Data.Content;
         }
 
-        public async Task<ResponseWrapper<Product>> GetProduct(string productId)
+        public async Task<Product> GetProduct(string productId)
         {
             var request = RequestFactory
                 .CreateRequest($"{SharedConfig.ProductsEndpoint}/{productId}");
 
             var result = await ClientFactory
                 .CreateClient()
-                .GetAsync<ResponseWrapper<Product>>(request);
+                .ExecuteGetAsync<ResponseWrapper<Product>>(request);
+            
+            EnsureSuccess(result);
 
-            return result;
+            return result.Data.Content;
+        }
+
+        public async Task<Product> UpdateProduct(Product product)
+        {
+            var patchRequestBody = new JsonPatchDocument<Product>().Replace(p => p.Stock, product.Stock);
+            
+            var request = RequestFactory
+                .CreateRequest($"{SharedConfig.ProductsEndpoint}/{product.MerchantProductNo}")
+                .AddJsonBody(patchRequestBody);
+
+            var result = await ClientFactory
+                .CreateClient()
+                .ExecuteAsync<ResponseWrapper<Product>>(request, Method.PATCH);
+            
+            EnsureSuccess(result);
+
+            var updatedProduct = await GetProduct(product.MerchantProductNo);
+
+            return updatedProduct;
         }
     }
 }

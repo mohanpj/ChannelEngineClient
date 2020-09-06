@@ -6,7 +6,8 @@ namespace Contracts
 {
     public interface IProductsRepository
     {
-        Task<ResponseWrapper<IEnumerable<Product>>> GetProductsByMerchantNo(IEnumerable<string> productIds);
-        Task<ResponseWrapper<Product>> GetProduct(string productId);
+        Task<IEnumerable<Product>> GetProductsByMerchantNo(IEnumerable<string> productIds);
+        Task<Product> GetProduct(string productId);
+        Task<Product> UpdateProduct(Product product);
     }
 }

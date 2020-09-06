@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using Contracts.Console;
 using MediatR;
 using Models;
 using Repository.API.Commands;
+using Repository.API.Queries;
 using Shared.Extensions;
 
 namespace ChannelEngineConsoleApp.Services
@@ -37,7 +39,6 @@ namespace ChannelEngineConsoleApp.Services
             _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
             _printer.WriteLine("Choose option:");
             _printer.WriteLine("1) Get all orders with status");
-            _printer.WriteLine("2) Set product quantity to 25");
             _printer.WriteLine("0) EXIT");
             _printer.WriteLine();
             var key = Console.ReadKey().Key;
@@ -46,9 +47,6 @@ namespace ChannelEngineConsoleApp.Services
             {
                 case ConsoleKey.D1:
                     await ShowAllOrdersWithStatus();
-                    return true;
-                case ConsoleKey.D2:
-                    SelectProductToUpdate();
                     return true;
                 case ConsoleKey.D0:
                     return false;
@@ -94,7 +92,7 @@ namespace ChannelEngineConsoleApp.Services
                 while (true)
                 {
                     _printer.WriteLine("1) Get top 5 products sold");
-                    _printer.WriteLine("0) BACK");
+                    _printer.WriteLine("0) Return to main menu");
                     _printer.WriteLine();
                     var key = Console.ReadKey().Key;
                 
@@ -155,9 +153,10 @@ namespace ChannelEngineConsoleApp.Services
 
         private async Task ShowTopFiveProducts(IEnumerable<Order> orders)
         {
-            var query = new GetTopSoldProductsFromOrders(orders);
-            var topProducts = await _mediator.Send(query);
-
+            var query = new GetTopSoldProductsFromOrdersQuery(orders);
+            var products = await _mediator.Send(query);
+            var topProducts = products.ToArray();
+            
             _printer.Clear();
             _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
 
@@ -169,50 +168,22 @@ namespace ChannelEngineConsoleApp.Services
 
             table.Write(Format.Minimal);
 
-            _printer.WriteLine("Press any key to return to main menu...");
-            Console.ReadKey();
-        }
-
-        private void SelectProductToUpdate()
-        {
             while (true)
             {
-                _printer.Clear();
-                _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
-                _printer.WriteLine("Choose product:");
-                _printer.WriteLine("1) Dummy product1");
-                _printer.WriteLine("2) Dummy product2");
-                _printer.WriteLine("3) Dummy product3");
-                _printer.WriteLine("4) Dummy product4");
-                _printer.WriteLine("5) Dummy product5");
-                _printer.WriteLine("0) BACK");
+                _printer.WriteLine("1) Update product stock to 25");
+                _printer.WriteLine("0) Return to main menu");
                 _printer.WriteLine();
-
                 var key = Console.ReadKey().Key;
-
+                
                 switch (key)
                 {
                     case ConsoleKey.D1:
-                        UpdateProductStock("Dummy product1");
-                        break;
-                    case ConsoleKey.D2:
-                        UpdateProductStock("Dummy product2");
-                        break;
-                    case ConsoleKey.D3:
-                        UpdateProductStock("Dummy product3");
-                        break;
-                    case ConsoleKey.D4:
-                        UpdateProductStock("Dummy product4");
-                        break;
-                    case ConsoleKey.D5:
-                        UpdateProductStock("Dummy product5");
+                        await SelectProductToUpdate(topProducts.ToArray());
                         break;
                     case ConsoleKey.D0:
                         break;
                     default:
-                        _printer.WriteLine();
-                        _printer.WriteLine("Invalid option selected. Press any key to try again.");
-                        Console.ReadKey();
+                        _printer.WriteLine("\nInvalid option selected. Try again...");
                         continue;
                 }
 
@@ -220,11 +191,48 @@ namespace ChannelEngineConsoleApp.Services
             }
         }
 
-        private void UpdateProductStock(string productName)
+        private async Task SelectProductToUpdate(IReadOnlyList<TopProductDto> products)
         {
             _printer.Clear();
             _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
-            _printer.WriteLine($"{productName} stock has been updated.");
+            _printer.WriteLine("Choose product:");
+            for (int i = 0; i < products.Count; i++)
+            {
+                _printer.WriteLine($"{i+1}) {products[i].MerchantProductNo} {products[i].Name}");
+            }
+            _printer.WriteLine("0) Return to main menu");
+            _printer.WriteLine();
+            var key = Console.ReadKey();
+
+            while (!IsValidInputOption(key, products.Count))
+            {
+                _printer.WriteLine("\nInvalid option selected. Try again...");
+                key = Console.ReadKey();
+            }
+            
+            if (key.Key == ConsoleKey.D0) return;
+
+            var keyValue = Utilities.ConsoleKeyUtilities.GetIntFromDigitKey(key);
+
+            await UpdateProductStock(products[keyValue-1]);
+        }
+
+        private async Task UpdateProductStock(TopProductDto productDto)
+        {
+            var product = new Product
+            {
+                MerchantProductNo = productDto.MerchantProductNo,
+                Name = productDto.Name,
+                Ean = productDto.Ean,
+                Stock = 25
+            };
+            
+            var command = new UpdateProductStockCommand(product);
+            var updatedProduct = await _mediator.Send(command);
+            
+            _printer.Clear();
+            _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
+            _printer.WriteLine($"Merchant product Np {updatedProduct.MerchantProductNo} stock has been updated to {updatedProduct.Stock}.");
             _printer.WriteLine();
             _printer.WriteLine("Press any key to return to main menu...");
             Console.ReadKey();
@@ -238,6 +246,15 @@ namespace ChannelEngineConsoleApp.Services
             _printer.WriteLine();
             _printer.WriteLine("Press any key to continue...");
             Console.ReadKey();
+        }
+        
+        private bool IsValidInputOption(ConsoleKeyInfo key, int optionsCount)
+        {
+            if (!char.IsDigit(key.KeyChar)) return false;
+            
+            var value = Utilities.ConsoleKeyUtilities.GetIntFromDigitKey(key);
+            
+            return value >= 0 && value <= optionsCount;
         }
     }
 }
