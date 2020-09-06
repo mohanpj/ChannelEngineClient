@@ -6,8 +6,7 @@ namespace Services
     {
         public IOrdersService Orders { get; }
 
-        public ChannelEngineServiceWrapper(
-            IOrdersService orders)
+        public ChannelEngineServiceWrapper(IOrdersService orders)
         {
             Orders = orders;
         }

@@ -1,20 +1,22 @@
 ﻿using Contracts.ApiClient;
-using RestSharp;
+using Contracts.ApiClient.Factories;
 
 namespace Services
 {
     public abstract class ApiEndpointBase
     {
-        protected readonly IRestClient Client;
+        protected readonly IChannelEngineApiClientFactory ClientFactory;
+        protected readonly IChannelEngineApiRequestFactory RequestFactory;
+        protected readonly ISharedApiConfigurationProvider SharedConfig;
 
-        protected ApiEndpointBase(IChannelEngineApiClientFactory apiClientFactory)
+        protected ApiEndpointBase(
+            IChannelEngineApiClientFactory clientFactory,
+            IChannelEngineApiRequestFactory requestFactory,
+            ISharedApiConfigurationProvider sharedConfig)
         {
-            Client = apiClientFactory.CreateClient();
-        }
-
-        protected virtual IRestRequest CreateRequest()
-        {
-            return new RestRequest();
+            ClientFactory = clientFactory;
+            RequestFactory = requestFactory;
+            SharedConfig = sharedConfig;
         }
     }
 }

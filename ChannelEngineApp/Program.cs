@@ -1,9 +1,13 @@
 ﻿using System.Threading.Tasks;
 using Contracts;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Models;
 using Services;
+using Services.ApiClient.Commands;
+using Services.ApiClient.Handlers;
 using Shared;
 
 namespace ChannelEngineConsoleApp
@@ -36,6 +40,9 @@ namespace ChannelEngineConsoleApp
         {
             services.AddSharedServices(hostContext.Configuration)
                 .AddSingleton<IConsoleMenuService, ConsoleMenuService>()
+                .AddMediatR(typeof(AppHost))
+                .AddTransient<IRequestHandler<GetAllOrdersByStatusQuery, ResponseWrapper<Order>>,
+                    GetAllOrdersByStatusHandler>()
                 .AddHostedService<AppHost>();
         }
     }

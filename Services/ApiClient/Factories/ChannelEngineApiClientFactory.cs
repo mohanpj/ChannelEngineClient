@@ -1,8 +1,9 @@
 ﻿using Contracts.ApiClient;
+using Contracts.ApiClient.Factories;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 
-namespace Services.ApiClient
+namespace Services.ApiClient.Factories
 {
     public class ChannelEngineApiClientFactory : IChannelEngineApiClientFactory
     {

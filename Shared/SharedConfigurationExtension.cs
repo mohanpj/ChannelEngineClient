@@ -2,13 +2,14 @@
 
 using Contracts;
 using Contracts.ApiClient;
-
+using Contracts.ApiClient.Factories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Services;
 using Services.ApiClient;
+using Services.ApiClient.Factories;
 
 namespace Shared
 {
@@ -21,6 +22,7 @@ namespace Shared
             services.AddSingleton<ISharedApiConfigurationProvider, SharedApiConfigurationProvider>(provider => sharedApiConfig)
                 .AddSingleton<IChannelEngineServiceWrapper, ChannelEngineServiceWrapper>()
                 .AddSingleton<IChannelEngineApiClientFactory, ChannelEngineApiClientFactory>()
+                .AddSingleton<IChannelEngineApiRequestFactory, ChannelEngineApiRequestFactory>()
                 .AddTransient<IOrdersService, OrdersService>();
 
             return services;

@@ -1,6 +1,6 @@
 ﻿using RestSharp;
 
-namespace Contracts.ApiClient
+namespace Contracts.ApiClient.Factories
 {
     public interface IChannelEngineApiClientFactory
     {

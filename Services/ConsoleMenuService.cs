@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 using ConsoleTables;
 
 using Contracts;
-
+using MediatR;
 using Models;
+using Services.ApiClient.Commands;
 
 namespace Services
 {
     public class ConsoleMenuService : IConsoleMenuService
     {
-        private readonly IChannelEngineServiceWrapper _channelEngineService;
-
-        public ConsoleMenuService(IChannelEngineServiceWrapper channelEngineService)
+        private readonly IMediator _mediator;
+        public ConsoleMenuService(IMediator mediator)
         {
-            _channelEngineService = channelEngineService;
+            _mediator = mediator;
         }
 
         public async Task DrawMenuAsync()
@@ -63,7 +63,8 @@ namespace Services
             Console.Clear();
             Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
 
-            var response = await _channelEngineService.Orders.GetAllWithStatusAsync(status);
+            var query = new GetAllOrdersByStatusQuery(status);
+            var response = await _mediator.Send(query);
 
             if (response.Success)
             {
@@ -151,9 +152,9 @@ namespace Services
             Console.WriteLine("CHANNEL ENGINE CONSOLE\n");
 
             var table = new ConsoleTable("ID", "Name", "Ean", "Quantity");
-            for (int i = 0; i < products.Length; i++)
+            foreach (var product in products)
             {
-                table.AddRow(products[i].MerchantProductNo, products[i].Description, products[i].Gtin, products[i].Quantity);
+                table.AddRow(product.MerchantProductNo, product.Description, product.Gtin, product.Quantity);
             }
 
             table.Write(Format.Minimal);

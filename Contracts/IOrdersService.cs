@@ -5,6 +5,6 @@ namespace Contracts
 {
     public interface IOrdersService
     {
-        Task<ResponseWrapper<Order>> GetAllWithStatusAsync(OrderStatus status);
+        Task<ResponseWrapper<Order>> GetAllOrdersWithStatus(OrderStatus status);
     }
 }
