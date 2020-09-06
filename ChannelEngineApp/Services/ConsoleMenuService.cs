@@ -101,7 +101,7 @@ namespace ChannelEngineConsoleApp.Services
                     switch (key)
                     {
                         case ConsoleKey.D1:
-                            ShowTopFiveProducts(response);
+                            await ShowTopFiveProducts(response);
                             break;
                         case ConsoleKey.D0:
                             break;
@@ -153,20 +153,18 @@ namespace ChannelEngineConsoleApp.Services
                    Enum.IsDefined(typeof(OrderStatus), keyValue);
         }
 
-        private void ShowTopFiveProducts(IEnumerable<Order> orders)
+        private async Task ShowTopFiveProducts(IEnumerable<Order> orders)
         {
-            var products = orders.SelectMany(o => o.Lines)
-                .OrderByDescending(p => p.Quantity)
-                .Take(5)
-                .ToArray();
+            var query = new GetTopSoldProductsFromOrders(orders);
+            var topProducts = await _mediator.Send(query);
 
             _printer.Clear();
             _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
 
             var table = new ConsoleTable("ID", "Name", "Ean", "Quantity");
-            foreach (var product in products)
+            foreach (var product in topProducts)
             {
-                table.AddRow(product.MerchantProductNo, product.Description, product.Gtin, product.Quantity);
+                table.AddRow(product.MerchantProductNo, product.Name, product.Ean, product.TotalSold);
             }
 
             table.Write(Format.Minimal);

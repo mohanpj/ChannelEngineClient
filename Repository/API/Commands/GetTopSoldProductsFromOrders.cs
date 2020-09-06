@@ -4,13 +4,13 @@ using Models;
 
 namespace Repository.API.Commands
 {
-    public class GetTopSoldProductsFromOrders : IRequest<ResponseWrapper<IEnumerable<Product>>>
+    public class GetTopSoldProductsFromOrders : IRequest<IEnumerable<TopProductDto>>
     {
-        public GetTopSoldProductsFromOrders(IEnumerable<string> productIds)
+        public GetTopSoldProductsFromOrders(IEnumerable<Order> orders)
         {
-            ProductIds = productIds;
+            Orders = orders;
         }
 
-        public IEnumerable<string> ProductIds { get; }
+        public IEnumerable<Order> Orders { get; }
     }
 }

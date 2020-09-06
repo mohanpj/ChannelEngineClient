@@ -25,12 +25,15 @@ namespace Shared
             services.AddMediatR(typeof(GetAllOrdersByStatusHandler).Assembly)
                 .AddTransient<IOrdersRepository, OrdersRepository>()
                 .AddTransient<IProductsRepository, ProductsRepository>()
-                .AddSingleton<ISharedApiConfigurationProvider, SharedApiConfigurationProvider>(provider => sharedApiConfig)
+                .AddSingleton<ISharedApiConfigurationProvider, SharedApiConfigurationProvider>(provider =>
+                    sharedApiConfig)
                 .AddSingleton<IChannelEngineRepositoryWrapper, ChannelEngineRepositoryWrapper>()
                 .AddSingleton<IChannelEngineApiClientFactory, ChannelEngineApiClientFactory>()
                 .AddSingleton<IChannelEngineApiRequestFactory, ChannelEngineApiRequestFactory>()
                 .AddSingleton<IRequestHandler<GetAllOrdersByStatusQuery, IEnumerable<Order>>,
-                    GetAllOrdersByStatusHandler>();
+                    GetAllOrdersByStatusHandler>()
+                .AddSingleton<IRequestHandler<GetTopSoldProductsFromOrders, IEnumerable<TopProductDto>>,
+                    GetTopSoldProductsHandler>();
 
             return services;
         }

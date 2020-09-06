@@ -20,7 +20,7 @@ namespace Repository
         {
         }
 
-        public async Task<ResponseWrapper<IEnumerable<Product>>> GetProducts(IEnumerable<string> productIds)
+        public async Task<ResponseWrapper<IEnumerable<Product>>> GetProductsByMerchantNo(IEnumerable<string> productIds)
         {
             var request = RequestFactory
                 .CreateRequest(SharedConfig.ProductsEndpoint)
