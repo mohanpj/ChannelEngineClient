@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Models;
 
-namespace Contracts
+namespace Contracts.Repository
 {
     public interface IProductsRepository
     {

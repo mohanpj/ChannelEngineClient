@@ -3,6 +3,7 @@ using System.IO;
 using Contracts;
 using Contracts.ApiClient;
 using Contracts.ApiClient.Factories;
+using Contracts.Repository;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

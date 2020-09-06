@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Contracts;
+using Contracts.Repository;
 using MediatR;
 using Models;
 using Repository.API.Queries;

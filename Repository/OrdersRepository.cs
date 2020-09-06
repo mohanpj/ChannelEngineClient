@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Contracts;
 using Contracts.ApiClient;
 using Contracts.ApiClient.Factories;
+using Contracts.Repository;
 using Models;
 using Repository.API;
 using RestSharp;
