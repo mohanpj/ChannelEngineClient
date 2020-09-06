@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using Contracts.ApiClient;
 using Contracts.ApiClient.Factories;
+using Repository.API.Extensions;
 using RestSharp;
-using Shared.Extensions;
 
-namespace Repository
+namespace Repository.API
 {
     public abstract class ApiEndpointBase
     {

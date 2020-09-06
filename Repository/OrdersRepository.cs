@@ -5,6 +5,7 @@ using Contracts;
 using Contracts.ApiClient;
 using Contracts.ApiClient.Factories;
 using Models;
+using Repository.API;
 using RestSharp;
 
 namespace Repository
@@ -12,12 +13,12 @@ namespace Repository
     public class OrdersRepository : ApiEndpointBase, IOrdersRepository
     {
         private const string StatusesParam = "statuses";
-        
+
         public OrdersRepository(
             IChannelEngineApiRequestFactory requestFactory,
             IChannelEngineApiClientFactory clientFactory,
             ISharedApiConfigurationProvider configurationProvider)
-            :base(clientFactory, requestFactory, configurationProvider)
+            : base(clientFactory, requestFactory, configurationProvider)
         {
         }
 

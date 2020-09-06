@@ -15,7 +15,7 @@ namespace Repository.API.Handlers
         {
             _repository = repository;
         }
-        
+
         public async Task<Product> Handle(UpdateProductStockCommand request, CancellationToken cancellationToken)
         {
             var product = await _repository.Products.UpdateProduct(request.Product);

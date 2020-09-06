@@ -7,12 +7,12 @@ namespace ChannelEngineConsoleApp.Services
 {
     public class ConsolePrintingService : IConsolePrintingService
     {
-        public void WriteLine([Optional]string content)
+        public void WriteLine([Optional] string content)
         {
             Console.WriteLine(content);
         }
 
-        public void Write([Optional]string content)
+        public void Write([Optional] string content)
         {
             Console.Write(content);
         }

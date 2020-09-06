@@ -6,6 +6,7 @@ using Contracts.ApiClient;
 using Contracts.ApiClient.Factories;
 using Microsoft.AspNetCore.JsonPatch;
 using Models;
+using Repository.API;
 using RestSharp;
 
 namespace Repository
@@ -13,7 +14,7 @@ namespace Repository
     public class ProductsRepository : ApiEndpointBase, IProductsRepository
     {
         private const string MerchantProductListParam = "merchantProductNoList";
-        
+
         public ProductsRepository(IChannelEngineApiClientFactory clientFactory,
             IChannelEngineApiRequestFactory requestFactory,
             ISharedApiConfigurationProvider sharedConfig)
@@ -26,13 +27,13 @@ namespace Repository
             var request = RequestFactory
                 .CreateRequest(SharedConfig.ProductsEndpoint)
                 .AddParameter(MerchantProductListParam, string.Join(',', productIds));
-            
+
             var result = await ClientFactory
                 .CreateClient()
                 .ExecuteGetAsync<ResponseWrapper<IEnumerable<Product>>>(request);
-            
+
             EnsureSuccess(result);
-            
+
             return result.Data.Content;
         }
 
@@ -44,7 +45,7 @@ namespace Repository
             var result = await ClientFactory
                 .CreateClient()
                 .ExecuteGetAsync<ResponseWrapper<Product>>(request);
-            
+
             EnsureSuccess(result);
 
             return result.Data.Content;
@@ -53,7 +54,7 @@ namespace Repository
         public async Task<Product> UpdateProduct(Product product)
         {
             var patchRequestBody = new JsonPatchDocument<Product>().Replace(p => p.Stock, product.Stock);
-            
+
             var request = RequestFactory
                 .CreateRequest($"{SharedConfig.ProductsEndpoint}/{product.MerchantProductNo}")
                 .AddJsonBody(patchRequestBody);
@@ -61,7 +62,7 @@ namespace Repository
             var result = await ClientFactory
                 .CreateClient()
                 .ExecuteAsync<ResponseWrapper<Product>>(request, Method.PATCH);
-            
+
             EnsureSuccess(result);
 
             var updatedProduct = await GetProduct(product.MerchantProductNo);

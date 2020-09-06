@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-
 using Contracts;
 using Contracts.ApiClient;
 using Contracts.ApiClient.Factories;
@@ -29,7 +28,7 @@ namespace Shared
                 .AddRepositories()
                 .AddFactories()
                 .AddRequestHandlers();
-                
+
 
             return services;
         }
@@ -65,6 +64,5 @@ namespace Shared
             services.AddTransient<IOrdersRepository, OrdersRepository>()
                 .AddTransient<IProductsRepository, ProductsRepository>()
                 .AddSingleton<IChannelEngineRepositoryWrapper, ChannelEngineRepositoryWrapper>();
-
     }
 }

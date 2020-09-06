@@ -17,7 +17,8 @@ namespace Repository.API.Handlers
             _channelEngineRepository = channelEngineRepository;
         }
 
-        public async Task<IEnumerable<Order>> Handle(GetAllOrdersByStatusQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Order>> Handle(GetAllOrdersByStatusQuery request,
+            CancellationToken cancellationToken)
         {
             var orders = await _channelEngineRepository.OrdersRepository.GetAllOrdersWithStatus(request.Status);
             return orders;

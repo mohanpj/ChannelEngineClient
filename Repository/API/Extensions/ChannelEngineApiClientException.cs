@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Shared.Extensions
+namespace Repository.API.Extensions
 {
     public class ChannelEngineApiClientException : Exception
     {

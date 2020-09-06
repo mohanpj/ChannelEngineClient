@@ -9,6 +9,7 @@ namespace Repository.API.Factories
     public class ChannelEngineApiClientFactory : IChannelEngineApiClientFactory
     {
         private readonly Uri _apiUrl;
+
         public ChannelEngineApiClientFactory(ISharedApiConfigurationProvider configProvider)
         {
             _apiUrl = new Uri($"{configProvider.BaseUri}/{configProvider.ApiVersion}", UriKind.Absolute);
