@@ -1,0 +1,62 @@
+﻿@page "/orders"
+
+@using Contracts.ApiClient
+@using Models
+@inject IChannelEngineApiService ApiService
+
+<h1>Orders</h1>
+
+<p>This component gets orders with specified status.</p>
+<form class="form-inline">
+    <label class="" for="orderStatus">Order status</label>
+    <select class="form-control mx-sm-2 my-2" id="orderStatus" @bind="_status">
+        @foreach (var value in Enum.GetValues(typeof(OrderStatus)))
+        {
+            <option value="@value">@value</option>
+        }
+    </select>
+    <button type="button" class="btn btn-outline-primary" @onclick="GetOrdersAsync">Get orders</button>
+</form>
+
+
+@if (_orders != null)
+{
+    @if (_orders.Length == 0)
+    {
+        <p class="mt-4">No data to display...</p>
+    }
+    else
+    {
+        <table class="table mt-4">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Channel name</th>
+                <th>No of ordered products</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var order in _orders)
+            {
+                <tr>
+                    <td>@order.Id</td>
+                    <td>@order.ChannelName</td>
+                    <td>@order.Lines.Sum(l => l.Quantity)</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    private Order[] _orders;
+    private OrderStatus _status { get; set; }
+
+    protected async Task GetOrdersAsync()
+    {
+        var result = await ApiService.GetOrdersWithStatus(_status);
+        _orders = result.ToArray();
+    }
+
+}
