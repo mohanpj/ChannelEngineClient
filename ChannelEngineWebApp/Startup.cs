@@ -25,6 +25,7 @@ namespace ChannelEngineWebApp
             services.AddServerSideBlazor();
             services.AddMediatR(typeof(Startup).Assembly);
             services.AddSharedServices(Configuration);
+            services.AddProtectedBrowserStorage();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

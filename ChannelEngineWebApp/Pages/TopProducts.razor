@@ -1,0 +1,68 @@
+﻿@page "/products/top"
+
+@using Contracts.ApiClient
+@using Microsoft.AspNetCore.ProtectedBrowserStorage
+@using Models
+@inject IChannelEngineApiService ApiService
+@inject ProtectedSessionStorage SessionStorage
+
+<h1>Top products from orders</h1>
+
+<p>This component gets top 5 products sold.</p>
+
+@if (_products != null)
+{
+    @if (_products.Count == 0)
+    {
+        <p class="mt-4">No data to display...</p>
+    }
+    else
+    {
+        <table class="table mt-4">
+            <thead>
+            <tr>
+                <th>Merchant Product No</th>
+                <th>Name</th>
+                <th>EAN</th>
+                <th>Total sold</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var product in _products)
+            {
+                <tr>
+                    <td>@product.MerchantProductNo</td>
+                    <td>@product.Name</td>
+                    <td>@product.Ean</td>
+                    <td>@product.TotalSold</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+}
+else
+{
+    <p class="mt-4">Loading...</p>
+}
+
+@code {
+    private ICollection<TopProductDto> _products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var orders = await SessionStorage.GetAsync<Order[]>("orders");
+        if (orders != null && orders.Length > 0)
+        {
+            var result = await ApiService.GetTopSoldProductsFromOrders(orders);
+            _products = result.ToList();
+        }
+        else
+        {
+            _products = new List<TopProductDto>();
+        }
+
+        await SessionStorage.SetAsync("products", _products);
+    }
+
+}

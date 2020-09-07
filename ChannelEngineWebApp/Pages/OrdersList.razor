@@ -1,8 +1,10 @@
 ﻿@page "/orders"
 
 @using Contracts.ApiClient
+@using Microsoft.AspNetCore.ProtectedBrowserStorage
 @using Models
 @inject IChannelEngineApiService ApiService
+@inject ProtectedSessionStorage SessionStorage
 
 <h1>Orders</h1>
 
@@ -15,9 +17,9 @@
             <option value="@value">@value</option>
         }
     </select>
-    <button type="button" class="btn btn-outline-primary" @onclick="GetOrdersAsync">Get orders</button>
+    <button type="button" class="btn btn-outline-primary mr-sm-2 mr-2" @onclick="GetOrdersAsync">Get orders</button>
+    <button type="reset" class="btn btn-outline-danger" @onclick="ClearOrders">Clear</button>
 </form>
-
 
 @if (_orders != null)
 {
@@ -53,10 +55,22 @@
     private Order[] _orders;
     private OrderStatus _status { get; set; }
 
-    protected async Task GetOrdersAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        _orders = await SessionStorage.GetAsync<Order[]>("orders");
+    }
+
+    private async Task GetOrdersAsync()
     {
         var result = await ApiService.GetOrdersWithStatus(_status);
         _orders = result.ToArray();
+        await SessionStorage.SetAsync("orders", result);
+    }
+
+    private async Task ClearOrders()
+    {
+        _orders = null;
+        await SessionStorage.SetAsync("orders", _orders);
     }
 
 }
