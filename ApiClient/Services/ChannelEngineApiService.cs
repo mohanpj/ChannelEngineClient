@@ -23,7 +23,8 @@ namespace ApiClient.Services
             return await _mediator.Send(query);
         }
 
-        public async Task<IEnumerable<TopProductDto>> GetTopSoldProductsFromOrders(IEnumerable<Order> orders, int count = 5)
+        public async Task<IEnumerable<TopProductDto>> GetTopSoldProductsFromOrders(IEnumerable<Order> orders,
+            int count = 5)
         {
             var query = new GetTopSoldProductsFromOrdersQuery(orders, count);
             return await _mediator.Send(query);

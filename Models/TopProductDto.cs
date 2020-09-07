@@ -5,7 +5,7 @@
         public TopProductDto()
         {
         }
-        
+
         public TopProductDto(Product product, int quantity)
         {
             MerchantProductNo = product.MerchantProductNo;

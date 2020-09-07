@@ -8,8 +8,8 @@ namespace ChannelEngineConsoleApp
 {
     public class AppHost : IHostedService
     {
-        private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly IConsoleMenuService _consoleService;
+        private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly IConsolePrintingService _printingService;
 
         public AppHost(IConsoleMenuService consoleService,

@@ -1,5 +1,4 @@
 ﻿@page "/products/update"
-
 @using Contracts.ApiClient
 @using Microsoft.AspNetCore.ProtectedBrowserStorage
 @using Models
@@ -106,7 +105,7 @@
     private void ValidateSelection(ChangeEventArgs e)
     {
         _isDisabled = string.IsNullOrEmpty(e.Value.ToString());
-        
+
         if (!_isDisabled)
             _merchantProductNo = e.Value.ToString();
     }

@@ -54,12 +54,12 @@ namespace ApiClient
                 default:
                     throw new ChannelEngineApiClientException(
                         HttpStatusCode.BadGateway,
-                        $"Could not communicate with service",
+                        "Could not communicate with service",
                         new
                         {
                             ResponseContent = response.Content,
                             ResponseStatus = response.StatusCode,
-                            Resource = response.Request.Resource
+                            response.Request.Resource
                         });
             }
         }

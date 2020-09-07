@@ -7,6 +7,7 @@ using ConsoleTables;
 using Contracts.ApiClient;
 using Contracts.Console;
 using Models;
+using Utilities;
 
 namespace ChannelEngineConsoleApp.Services
 {
@@ -23,11 +24,8 @@ namespace ChannelEngineConsoleApp.Services
 
         public async Task RunAsync()
         {
-            bool showMenu = true;
-            while (showMenu)
-            {
-                showMenu = await MainMenu();
-            }
+            var showMenu = true;
+            while (showMenu) showMenu = await MainMenu();
         }
 
         private async Task<bool> MainMenu()
@@ -71,9 +69,7 @@ namespace ChannelEngineConsoleApp.Services
                 {
                     var table = new ConsoleTable("ID", "Channel name", "No of products");
                     foreach (var order in response)
-                    {
                         table.AddRow(order.Id, order.ChannelName, order.Lines.Sum(l => l.Quantity));
-                    }
 
                     _printer.WriteTable(table, Format.Minimal);
                 }
@@ -123,9 +119,7 @@ namespace ChannelEngineConsoleApp.Services
             var orderStatusNames = Enum.GetNames(typeof(OrderStatus));
 
             for (var i = 1; i <= orderStatusNames.Length; i++)
-            {
                 _printer.WriteLine($"{i - 1}) {orderStatusNames[i - 1]}");
-            }
 
             _printer.WriteLine();
             _printer.WriteLine("Select status:");
@@ -144,7 +138,7 @@ namespace ChannelEngineConsoleApp.Services
         private static bool InputIsValid(string key)
         {
             return key != string.Empty &&
-                   int.TryParse(key, out int keyValue) &&
+                   int.TryParse(key, out var keyValue) &&
                    Enum.IsDefined(typeof(OrderStatus), keyValue);
         }
 
@@ -158,9 +152,7 @@ namespace ChannelEngineConsoleApp.Services
 
             var table = new ConsoleTable("ID", "Name", "Ean", "Quantity");
             foreach (var product in topProducts)
-            {
                 table.AddRow(product.MerchantProductNo, product.Name, product.Ean, product.TotalSold);
-            }
 
             table.Write(Format.Minimal);
 
@@ -192,10 +184,8 @@ namespace ChannelEngineConsoleApp.Services
             _printer.Clear();
             _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
             _printer.WriteLine("Choose product:");
-            for (int i = 0; i < products.Count; i++)
-            {
+            for (var i = 0; i < products.Count; i++)
                 _printer.WriteLine($"{i + 1}) {products[i].MerchantProductNo} {products[i].Name}");
-            }
 
             _printer.WriteLine("0) Return to main menu");
             _printer.WriteLine();
@@ -209,7 +199,7 @@ namespace ChannelEngineConsoleApp.Services
 
             if (key.Key == ConsoleKey.D0) return;
 
-            var keyValue = Utilities.ConsoleKeyUtilities.GetIntFromDigitKey(key);
+            var keyValue = ConsoleKeyUtilities.GetIntFromDigitKey(key);
 
             await UpdateProductStock(products[keyValue - 1]);
         }
@@ -217,7 +207,7 @@ namespace ChannelEngineConsoleApp.Services
         private async Task UpdateProductStock(TopProductDto productDto)
         {
             var updatedProduct = await _apiService.UpdateProductStock(productDto);
-            
+
             _printer.Clear();
             _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
             _printer.WriteLine(
@@ -241,7 +231,7 @@ namespace ChannelEngineConsoleApp.Services
         {
             if (!char.IsDigit(key.KeyChar)) return false;
 
-            var value = Utilities.ConsoleKeyUtilities.GetIntFromDigitKey(key);
+            var value = ConsoleKeyUtilities.GetIntFromDigitKey(key);
 
             return value >= 0 && value <= optionsCount;
         }

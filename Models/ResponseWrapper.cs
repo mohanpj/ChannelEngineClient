@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Models
+﻿namespace Models
 {
     public class ResponseWrapper<T> : BaseResponseWrapper
     {

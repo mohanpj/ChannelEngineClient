@@ -17,7 +17,8 @@ namespace ApiClient.Handlers
             _repository = repository;
         }
 
-        public async Task<IEnumerable<Product>> Handle(GetProductsByIdsQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Product>> Handle(GetProductsByIdsQuery request,
+            CancellationToken cancellationToken)
         {
             var response = await _repository.Products.GetProductsByMerchantNo(request.ProductIds);
             return response;
