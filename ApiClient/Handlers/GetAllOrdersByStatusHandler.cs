@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Contracts;
+using ApiClient.Queries;
 using Contracts.Repository;
 using MediatR;
 using Models;
-using Repository.API.Queries;
 
-namespace Repository.API.Handlers
+namespace ApiClient.Handlers
 {
     public class GetAllOrdersByStatusHandler : IRequestHandler<GetAllOrdersByStatusQuery, IEnumerable<Order>>
     {

@@ -4,13 +4,13 @@ using Contracts.ApiClient.Factories;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 
-namespace Repository.API.Factories
+namespace ApiClient.Factories
 {
     public class ChannelEngineApiClientFactory : IChannelEngineApiClientFactory
     {
         private readonly Uri _apiUrl;
 
-        public ChannelEngineApiClientFactory(ISharedApiConfigurationProvider configProvider)
+        public ChannelEngineApiClientFactory(ISharedSettingsProvider configProvider)
         {
             _apiUrl = new Uri($"{configProvider.BaseUri}/{configProvider.ApiVersion}", UriKind.Absolute);
         }

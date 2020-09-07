@@ -2,13 +2,12 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Contracts;
+using ApiClient.Queries;
 using Contracts.Repository;
 using MediatR;
 using Models;
-using Repository.API.Queries;
 
-namespace Repository.API.Handlers
+namespace ApiClient.Handlers
 {
     public class
         GetTopSoldProductsHandler : IRequestHandler<GetTopSoldProductsFromOrdersQuery, IEnumerable<TopProductDto>>
@@ -31,7 +30,7 @@ namespace Repository.API.Handlers
 
             var quantityAggregate = request.Orders.SelectMany(o => o.Lines)
                 .Aggregate(new Dictionary<string, int>(), AggregateQuantityByProduct)
-                .Take(5)
+                .Take(request.Count)
                 .ToArray();
 
             var result = products.Join(quantityAggregate,

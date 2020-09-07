@@ -2,7 +2,7 @@
 using MediatR;
 using Models;
 
-namespace Repository.API.Queries
+namespace ApiClient.Queries
 {
     public class GetAllOrdersByStatusQuery : IRequest<IEnumerable<Order>>
     {

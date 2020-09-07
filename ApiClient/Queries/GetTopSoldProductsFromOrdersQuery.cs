@@ -2,15 +2,17 @@
 using MediatR;
 using Models;
 
-namespace Repository.API.Queries
+namespace ApiClient.Queries
 {
     public class GetTopSoldProductsFromOrdersQuery : IRequest<IEnumerable<TopProductDto>>
     {
-        public GetTopSoldProductsFromOrdersQuery(IEnumerable<Order> orders)
+        public GetTopSoldProductsFromOrdersQuery(IEnumerable<Order> orders, int count)
         {
             Orders = orders;
+            Count = count;
         }
 
         public IEnumerable<Order> Orders { get; }
+        public int Count { get; }
     }
 }

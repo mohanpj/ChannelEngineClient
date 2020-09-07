@@ -1,13 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Contracts;
+using ApiClient;
 using Contracts.ApiClient;
 using Contracts.ApiClient.Factories;
 using Contracts.Repository;
 using Microsoft.AspNetCore.JsonPatch;
 using Models;
-using Repository.API;
 using RestSharp;
 
 namespace Repository
@@ -18,7 +16,7 @@ namespace Repository
 
         public ProductsRepository(IChannelEngineApiClientFactory clientFactory,
             IChannelEngineApiRequestFactory requestFactory,
-            ISharedApiConfigurationProvider sharedConfig)
+            ISharedSettingsProvider sharedConfig)
             : base(clientFactory, requestFactory, sharedConfig)
         {
         }

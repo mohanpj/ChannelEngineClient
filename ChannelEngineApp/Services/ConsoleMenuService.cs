@@ -2,25 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ApiClient.Extensions;
 using ConsoleTables;
+using Contracts.ApiClient;
 using Contracts.Console;
-using MediatR;
 using Models;
-using Repository.API.Commands;
-using Repository.API.Extensions;
-using Repository.API.Queries;
 
 namespace ChannelEngineConsoleApp.Services
 {
     public class ConsoleMenuService : IConsoleMenuService
     {
-        private readonly IMediator _mediator;
+        private readonly IChannelEngineApiService _apiService;
         private readonly IConsolePrintingService _printer;
 
-        public ConsoleMenuService(IMediator mediator, IConsolePrintingService printer)
+        public ConsoleMenuService(IConsolePrintingService printer, IChannelEngineApiService apiService)
         {
-            _mediator = mediator;
             _printer = printer;
+            _apiService = apiService;
         }
 
         public async Task RunAsync()
@@ -66,8 +64,7 @@ namespace ChannelEngineConsoleApp.Services
 
             try
             {
-                var query = new GetAllOrdersByStatusQuery(status);
-                var result = await _mediator.Send(query);
+                var result = await _apiService.GetOrdersWithStatus(status);
                 var response = result.ToArray();
 
                 if (response.Any())
@@ -153,8 +150,7 @@ namespace ChannelEngineConsoleApp.Services
 
         private async Task ShowTopFiveProducts(IEnumerable<Order> orders)
         {
-            var query = new GetTopSoldProductsFromOrdersQuery(orders);
-            var products = await _mediator.Send(query);
+            var products = await _apiService.GetTopSoldProductsFromOrders(orders);
             var topProducts = products.ToArray();
 
             _printer.Clear();
@@ -220,17 +216,8 @@ namespace ChannelEngineConsoleApp.Services
 
         private async Task UpdateProductStock(TopProductDto productDto)
         {
-            var product = new Product
-            {
-                MerchantProductNo = productDto.MerchantProductNo,
-                Name = productDto.Name,
-                Ean = productDto.Ean,
-                Stock = 25
-            };
-
-            var command = new UpdateProductStockCommand(product);
-            var updatedProduct = await _mediator.Send(command);
-
+            var updatedProduct = await _apiService.UpdateProductStock(productDto);
+            
             _printer.Clear();
             _printer.WriteLine("CHANNEL ENGINE CONSOLE\n");
             _printer.WriteLine(

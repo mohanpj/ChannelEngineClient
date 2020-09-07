@@ -1,12 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Contracts;
+using ApiClient.Commands;
 using Contracts.Repository;
 using MediatR;
 using Models;
-using Repository.API.Commands;
 
-namespace Repository.API.Handlers
+namespace ApiClient.Handlers
 {
     public class UpdateProductStockHandler : IRequestHandler<UpdateProductStockCommand, Product>
     {
@@ -19,8 +18,9 @@ namespace Repository.API.Handlers
 
         public async Task<Product> Handle(UpdateProductStockCommand request, CancellationToken cancellationToken)
         {
-            var product = await _repository.Products.UpdateProduct(request.Product);
-            return product;
+            var product = await _repository.Products.GetProduct(request.Product.MerchantProductNo);
+            var updatedProduct = await _repository.Products.UpdateProduct(product);
+            return updatedProduct;
         }
     }
 }

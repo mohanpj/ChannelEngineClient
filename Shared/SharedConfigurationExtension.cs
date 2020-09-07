@@ -1,6 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Contracts;
+using ApiClient.Commands;
+using ApiClient.Factories;
+using ApiClient.Handlers;
+using ApiClient.Queries;
+using ApiClient.Services;
 using Contracts.ApiClient;
 using Contracts.ApiClient.Factories;
 using Contracts.Repository;
@@ -10,10 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Models;
 using Repository;
-using Repository.API.Commands;
-using Repository.API.Factories;
-using Repository.API.Handlers;
-using Repository.API.Queries;
 
 namespace Shared
 {
@@ -21,15 +21,14 @@ namespace Shared
     {
         public static IServiceCollection AddSharedServices(this IServiceCollection services, IConfiguration config)
         {
-            var sharedApiConfig = new SharedApiConfigurationProvider();
-            config.GetSection(SharedApiConfigurationProvider.SettingsRoot).Bind(sharedApiConfig);
-            services.AddMediatR(typeof(GetAllOrdersByStatusHandler).Assembly)
-                .AddSingleton<ISharedApiConfigurationProvider, SharedApiConfigurationProvider>(provider =>
-                    sharedApiConfig)
+            var settings = new SharedSettingsProvider();
+            services.AddMediatR(typeof(GetAllOrdersByStatusHandler).Assembly);
+            config.GetSection(SharedSettingsProvider.SettingsRoot).Bind(settings);
+            services.AddSingleton<ISharedSettingsProvider, SharedSettingsProvider>(provider => settings)
                 .AddRepositories()
                 .AddFactories()
-                .AddRequestHandlers();
-
+                .AddRequestHandlers()
+                .AddSingleton<IChannelEngineApiService, ChannelEngineApiService>();
 
             return services;
         }
@@ -40,12 +39,10 @@ namespace Shared
             var sharedDirectory = Path.Combine(env.ContentRootPath, "..", "Shared");
 
             config.AddJsonFile(Path.Combine(sharedDirectory, "sharedSettings.json"), true, true)
-                .AddJsonFile(Path.Combine(sharedDirectory, $"sharedSettings.{env.EnvironmentName}.json"), true, true)
-                .AddJsonFile("sharedSettings.json", true, true)
-                .AddJsonFile($"sharedSettings.{env.EnvironmentName}.json", true, true);
+                .AddJsonFile(Path.Combine(sharedDirectory, $"sharedSettings.{env.EnvironmentName}.json"), true, true);
 
             if (env.IsDevelopment())
-                config.AddUserSecrets(typeof(SharedApiConfigurationProvider).Assembly);
+                config.AddUserSecrets(typeof(SharedSettingsProvider).Assembly);
 
             return config;
         }

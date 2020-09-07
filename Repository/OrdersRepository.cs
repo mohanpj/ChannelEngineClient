@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Contracts;
+using ApiClient;
 using Contracts.ApiClient;
 using Contracts.ApiClient.Factories;
 using Contracts.Repository;
 using Models;
-using Repository.API;
-using RestSharp;
 
 namespace Repository
 {
@@ -18,7 +16,7 @@ namespace Repository
         public OrdersRepository(
             IChannelEngineApiRequestFactory requestFactory,
             IChannelEngineApiClientFactory clientFactory,
-            ISharedApiConfigurationProvider configurationProvider)
+            ISharedSettingsProvider configurationProvider)
             : base(clientFactory, requestFactory, configurationProvider)
         {
         }

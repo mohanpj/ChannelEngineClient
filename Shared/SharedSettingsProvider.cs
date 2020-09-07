@@ -2,7 +2,7 @@
 
 namespace Shared
 {
-    public class SharedApiConfigurationProvider : ISharedApiConfigurationProvider
+    public class SharedSettingsProvider : ISharedSettingsProvider
     {
         public const string SettingsRoot = "ApiConfig";
         public string BaseUri { get; set; }

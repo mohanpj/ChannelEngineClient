@@ -1,6 +1,6 @@
 ﻿namespace Contracts.ApiClient
 {
-    public interface ISharedApiConfigurationProvider
+    public interface ISharedSettingsProvider
     {
         string BaseUri { get; set; }
         string ApiVersion { get; set; }

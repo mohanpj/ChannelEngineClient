@@ -1,21 +1,21 @@
 ﻿using System.Net;
+using ApiClient.Extensions;
 using Contracts.ApiClient;
 using Contracts.ApiClient.Factories;
-using Repository.API.Extensions;
 using RestSharp;
 
-namespace Repository.API
+namespace ApiClient
 {
     public abstract class ApiEndpointBase
     {
         protected readonly IChannelEngineApiClientFactory ClientFactory;
         protected readonly IChannelEngineApiRequestFactory RequestFactory;
-        protected readonly ISharedApiConfigurationProvider SharedConfig;
+        protected readonly ISharedSettingsProvider SharedConfig;
 
         protected ApiEndpointBase(
             IChannelEngineApiClientFactory clientFactory,
             IChannelEngineApiRequestFactory requestFactory,
-            ISharedApiConfigurationProvider sharedConfig)
+            ISharedSettingsProvider sharedConfig)
         {
             ClientFactory = clientFactory;
             RequestFactory = requestFactory;
