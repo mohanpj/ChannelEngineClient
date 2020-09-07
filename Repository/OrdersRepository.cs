@@ -27,10 +27,7 @@ namespace Repository
             var request = RequestFactory
                 .CreateRequest(SharedConfig.OrdersEndpoint);
 
-            if (statusName != null && status != OrderStatus.NONE)
-            {
-                request.AddQueryParameter(StatusesParam, statusName);
-            }
+            if (statusName != null && status != OrderStatus.NONE) request.AddQueryParameter(StatusesParam, statusName);
 
             var response = await ClientFactory
                 .CreateClient()

@@ -4,6 +4,7 @@ using Contracts.Console;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Shared;
 
 namespace ChannelEngineConsoleApp
@@ -18,8 +19,14 @@ namespace ChannelEngineConsoleApp
         private static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
+                .ConfigureLogging(SetupLogging)
                 .ConfigureAppConfiguration(CreateConfiguration)
                 .ConfigureServices(RegisterServices);
+        }
+
+        private static void SetupLogging(ILoggingBuilder logging)
+        {
+            logging.ClearProviders();
         }
 
         private static void CreateConfiguration(HostBuilderContext hostContext, IConfigurationBuilder config)
@@ -33,9 +40,9 @@ namespace ChannelEngineConsoleApp
 
         private static void RegisterServices(HostBuilderContext hostContext, IServiceCollection services)
         {
-            services.AddSingleton<IConsolePrintingService, ConsolePrintingService>()
+            services.AddSharedServices(hostContext.Configuration)
+                .AddSingleton<IConsolePrintingService, ConsolePrintingService>()
                 .AddSingleton<IConsoleMenuService, ConsoleMenuService>()
-                .AddSharedServices(hostContext.Configuration)
                 .AddHostedService<AppHost>();
         }
     }
