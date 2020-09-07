@@ -62,7 +62,7 @@ else
             _products = new List<TopProductDto>();
         }
 
-        await SessionStorage.SetAsync("products", _products);
+        await SessionStorage.SetAsync("topProducts", _products);
     }
 
 }

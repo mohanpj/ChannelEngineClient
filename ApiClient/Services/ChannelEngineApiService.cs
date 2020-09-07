@@ -29,6 +29,12 @@ namespace ApiClient.Services
             return await _mediator.Send(query);
         }
 
+        public async Task<IEnumerable<Product>> GetProducts(string[] productIds)
+        {
+            var query = new GetProductsByIdsQuery(productIds);
+            return await _mediator.Send(query);
+        }
+
         public async Task<Product> UpdateProductStock(TopProductDto product, int stock = 25)
         {
             var command = new UpdateProductStockCommand(product, stock);

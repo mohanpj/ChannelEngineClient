@@ -52,7 +52,8 @@ namespace Shared
                     GetAllOrdersByStatusHandler>()
                 .AddSingleton<IRequestHandler<GetTopSoldProductsFromOrdersQuery, IEnumerable<TopProductDto>>,
                     GetTopSoldProductsHandler>()
-                .AddSingleton<IRequestHandler<UpdateProductStockCommand, Product>, UpdateProductStockHandler>();
+                .AddSingleton<IRequestHandler<UpdateProductStockCommand, Product>, UpdateProductStockHandler>()
+                .AddSingleton<IRequestHandler<GetProductsByIdsQuery, IEnumerable<Product>>, GetProductsByIdsHandler>();
 
         private static IServiceCollection AddFactories(this IServiceCollection services) =>
             services.AddSingleton<IChannelEngineApiClientFactory, ChannelEngineApiClientFactory>()

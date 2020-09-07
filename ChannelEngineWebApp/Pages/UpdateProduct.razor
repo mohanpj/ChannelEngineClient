@@ -1,0 +1,114 @@
+﻿@page "/products/update"
+
+@using Contracts.ApiClient
+@using Microsoft.AspNetCore.ProtectedBrowserStorage
+@using Models
+@inject IChannelEngineApiService ApiService
+@inject ProtectedSessionStorage SessionStorage
+
+<h1>Update product stock</h1>
+
+<p>This component allows user to update top sold products stock.</p>
+
+@if (_topProducts != null && _topProducts.Length > 0)
+{
+    <form class="form-inline">
+        <label for="product">Product</label>
+        <select class="form-control mx-sm-2 my-2" id="product" @onchange="ValidateSelection">
+            <option selected disabled value>Select product...</option>
+            @foreach (var product in _topProducts)
+            {
+                <option value="@product.MerchantProductNo">@product.Name</option>
+            }
+        </select>
+        <button disabled="@_isDisabled" type="button" class="btn btn-outline-primary mb-sm-2 mt-2"
+                @onclick="UpdateSelectedProductStock">
+            Update stock to 25
+        </button>
+    </form>
+}
+
+@if (_updatedProduct != null)
+{
+    <div class="alert alert-info" role="alert">
+        Product @_updatedProduct.Name stock value has been updated to: @_updatedProduct.Stock
+    </div>
+}
+
+@if (_products != null)
+{
+    @if (_products.Length == 0)
+    {
+        <p class="mt-4">No data to display...</p>
+    }
+    else
+    {
+        <table class="table mt-4">
+            <thead>
+            <tr>
+                <th>Merchant product No</th>
+                <th>Name</th>
+                <th>EAN</th>
+                <th>Stock</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var product in _products)
+            {
+                <tr>
+                    <td>@product.MerchantProductNo</td>
+                    <td>@product.Name</td>
+                    <td>@product.Ean</td>
+                    <td>@product.Stock</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    private Product _updatedProduct;
+    private Product[] _products;
+    private TopProductDto[] _topProducts;
+    private string _merchantProductNo;
+    private string[] _productIds;
+    private bool _isDisabled = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _updatedProduct = null;
+        _topProducts = await SessionStorage.GetAsync<TopProductDto[]>("topProducts");
+
+        if (_topProducts != null && _topProducts.Length > 0)
+        {
+            _productIds = _topProducts.Select(p => p.MerchantProductNo).ToArray();
+            await GetProductsAsync(_productIds);
+        }
+
+        await SessionStorage.SetAsync("productIds", _productIds);
+    }
+
+    private async Task UpdateSelectedProductStock()
+    {
+        var product = _topProducts.FirstOrDefault(tp => tp.MerchantProductNo == _merchantProductNo);
+        _updatedProduct = await ApiService.UpdateProductStock(product);
+        var productsIds = await SessionStorage.GetAsync<string[]>("productIds");
+        await GetProductsAsync(productsIds);
+    }
+
+    private async Task GetProductsAsync(string[] productsIds)
+    {
+        var result = await ApiService.GetProducts(productsIds);
+        _products = result.ToArray();
+    }
+
+    private void ValidateSelection(ChangeEventArgs e)
+    {
+        _isDisabled = string.IsNullOrEmpty(e.Value.ToString());
+        
+        if (!_isDisabled)
+            _merchantProductNo = e.Value.ToString();
+    }
+
+}

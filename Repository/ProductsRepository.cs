@@ -50,9 +50,9 @@ namespace Repository
             return result.Data.Content;
         }
 
-        public async Task<Product> UpdateProduct(Product product)
+        public async Task<Product> UpdateProduct(Product product, int stock)
         {
-            var patchRequestBody = new JsonPatchDocument<Product>().Replace(p => p.Stock, product.Stock);
+            var patchRequestBody = new JsonPatchDocument<Product>().Replace(p => p.Stock, stock);
 
             var request = RequestFactory
                 .CreateRequest($"{SharedConfig.ProductsEndpoint}/{product.MerchantProductNo}")

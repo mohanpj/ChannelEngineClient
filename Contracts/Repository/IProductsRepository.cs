@@ -8,6 +8,6 @@ namespace Contracts.Repository
     {
         Task<IEnumerable<Product>> GetProductsByMerchantNo(IEnumerable<string> productIds);
         Task<Product> GetProduct(string productId);
-        Task<Product> UpdateProduct(Product product);
+        Task<Product> UpdateProduct(Product product, int stock);
     }
 }

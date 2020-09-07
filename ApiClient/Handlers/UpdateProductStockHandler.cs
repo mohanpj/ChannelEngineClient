@@ -19,7 +19,7 @@ namespace ApiClient.Handlers
         public async Task<Product> Handle(UpdateProductStockCommand request, CancellationToken cancellationToken)
         {
             var product = await _repository.Products.GetProduct(request.Product.MerchantProductNo);
-            var updatedProduct = await _repository.Products.UpdateProduct(product);
+            var updatedProduct = await _repository.Products.UpdateProduct(product, request.StockValue);
             return updatedProduct;
         }
     }
