@@ -8,11 +8,9 @@ using ApiClient.Handlers;
 using ApiClient.Queries;
 using Contracts.Repository;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Models;
 using Moq;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace ApiClient.Tests.Handlers
 {
@@ -35,7 +33,7 @@ namespace ApiClient.Tests.Handlers
                     var products = merchantProductIds
                         .Select(prodNo => ProductsMockData.FirstOrDefault(md => md.MerchantProductNo == prodNo))
                         .Where(res => res != null);
-                    return Task.FromResult<IEnumerable<Product>>(products);
+                    return Task.FromResult(products);
                 });
         }
 
