@@ -2,7 +2,7 @@
 {
     public interface IChannelEngineRepositoryWrapper
     {
-        public IOrdersRepository OrdersRepository { get; }
+        public IOrdersRepository Orders { get; }
         public IProductsRepository Products { get; }
     }
 }

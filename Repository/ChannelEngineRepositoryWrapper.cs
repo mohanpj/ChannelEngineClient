@@ -7,11 +7,11 @@ namespace Repository
         public ChannelEngineRepositoryWrapper(IOrdersRepository ordersRepository,
             IProductsRepository productsRepository)
         {
-            OrdersRepository = ordersRepository;
+            Orders = ordersRepository;
             Products = productsRepository;
         }
 
-        public IOrdersRepository OrdersRepository { get; }
+        public IOrdersRepository Orders { get; }
         public IProductsRepository Products { get; }
     }
 }
